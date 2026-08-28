@@ -1,0 +1,355 @@
+{
+  "generated_at": "2026-08-28T18:35:56+00:00",
+  "course": "GPT-2 with Mixture of Experts, from scratch",
+  "repo": "https://github.com/AleDeclerk/gpt2-moe-from-scratch",
+  "totals": {
+    "chapters_total": 14,
+    "chapters_done": 0,
+    "chapters_written": 3,
+    "tests_total": 38,
+    "tests_passed": 0
+  },
+  "parts": [
+    {
+      "title": "The base",
+      "blurb": "The operations that every later chapter uses, and the data that feeds them.",
+      "chapters": [
+        {
+          "dir": "ch00_tensors",
+          "title": "Tensors, softmax, gradients",
+          "writes": "A stable softmax, cross entropy, a backward pass by hand",
+          "module": "tensors",
+          "exists": true,
+          "promoted": false,
+          "tests": [
+            {
+              "name": "test_softmax_matches_pytorch",
+              "passed": false
+            },
+            {
+              "name": "test_softmax_rows_sum_to_one",
+              "passed": false
+            },
+            {
+              "name": "test_softmax_is_stable",
+              "passed": false
+            },
+            {
+              "name": "test_cross_entropy_matches_pytorch",
+              "passed": false
+            },
+            {
+              "name": "test_cross_entropy_of_a_uniform_model",
+              "passed": false
+            },
+            {
+              "name": "test_cross_entropy_is_stable",
+              "passed": false
+            },
+            {
+              "name": "test_linear_backward_matches_autograd",
+              "passed": false
+            },
+            {
+              "name": "test_linear_backward_with_one_row",
+              "passed": false
+            }
+          ],
+          "tests_total": 8,
+          "tests_passed": 0,
+          "status": "todo"
+        },
+        {
+          "dir": "ch01_data",
+          "title": "The data pipeline",
+          "writes": "A character tokenizer, the split, the batch sampler",
+          "module": "data",
+          "exists": true,
+          "promoted": false,
+          "tests": [
+            {
+              "name": "test_vocabulary_is_sorted_and_complete",
+              "passed": false
+            },
+            {
+              "name": "test_encode_and_decode_are_inverse",
+              "passed": false
+            },
+            {
+              "name": "test_encode_gives_valid_identifiers",
+              "passed": false
+            },
+            {
+              "name": "test_vocabulary_does_not_depend_on_the_order_of_the_text",
+              "passed": false
+            },
+            {
+              "name": "test_split_keeps_every_element_in_order",
+              "passed": false
+            },
+            {
+              "name": "test_split_uses_the_end_for_validation",
+              "passed": false
+            },
+            {
+              "name": "test_split_accepts_another_fraction",
+              "passed": false
+            },
+            {
+              "name": "test_batch_has_the_correct_shape_and_type",
+              "passed": false
+            },
+            {
+              "name": "test_target_is_the_input_moved_one_position",
+              "passed": false
+            },
+            {
+              "name": "test_batch_holds_real_windows_of_the_data",
+              "passed": false
+            },
+            {
+              "name": "test_a_fixed_seed_gives_the_same_batch",
+              "passed": false
+            },
+            {
+              "name": "test_the_last_block_is_reachable",
+              "passed": false
+            },
+            {
+              "name": "test_no_index_leaves_the_data",
+              "passed": false
+            }
+          ],
+          "tests_total": 13,
+          "tests_passed": 0,
+          "status": "todo"
+        },
+        {
+          "dir": "ch02_bpe",
+          "title": "Byte Pair Encoding",
+          "writes": "The BPE algorithm, and a comparison against tiktoken",
+          "module": "bpe",
+          "exists": true,
+          "promoted": false,
+          "tests": [
+            {
+              "name": "test_get_stats_counts_adjacent_pairs",
+              "passed": false
+            },
+            {
+              "name": "test_get_stats_counts_an_overlap_two_times",
+              "passed": false
+            },
+            {
+              "name": "test_get_stats_of_a_short_list_is_empty",
+              "passed": false
+            },
+            {
+              "name": "test_merge_replaces_every_occurrence",
+              "passed": false
+            },
+            {
+              "name": "test_merge_handles_the_overlap",
+              "passed": false
+            },
+            {
+              "name": "test_merge_keeps_the_end_of_the_list",
+              "passed": false
+            },
+            {
+              "name": "test_merge_does_not_change_the_input",
+              "passed": false
+            },
+            {
+              "name": "test_merge_of_the_readme_example",
+              "passed": false
+            },
+            {
+              "name": "test_train_gives_the_requested_vocabulary_size",
+              "passed": false
+            },
+            {
+              "name": "test_train_rejects_a_vocabulary_under_256",
+              "passed": false
+            },
+            {
+              "name": "test_train_stops_early_when_no_pair_is_left",
+              "passed": false
+            },
+            {
+              "name": "test_vocabulary_holds_the_bytes_of_each_token",
+              "passed": false
+            },
+            {
+              "name": "test_encode_and_decode_are_inverse",
+              "passed": false
+            },
+            {
+              "name": "test_roundtrip_of_text_that_is_not_in_the_corpus",
+              "passed": false
+            },
+            {
+              "name": "test_encode_applies_the_merges_in_order",
+              "passed": false
+            },
+            {
+              "name": "test_encode_compresses_the_text",
+              "passed": false
+            },
+            {
+              "name": "test_decode_survives_an_invalid_byte_sequence",
+              "passed": false
+            }
+          ],
+          "tests_total": 17,
+          "tests_passed": 0,
+          "status": "todo"
+        }
+      ]
+    },
+    {
+      "title": "The transformer",
+      "blurb": "From a bigram baseline to a model that reproduces the logits of the real GPT-2.",
+      "chapters": [
+        {
+          "dir": "ch03_embeddings",
+          "title": "Embeddings and a baseline",
+          "writes": "A bigram model, and the first sanity check at log(V)",
+          "module": "embeddings",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        },
+        {
+          "dir": "ch04_attention",
+          "title": "Self-attention",
+          "writes": "One head, the causal mask, the scale of 1/sqrt(d)",
+          "module": "attention",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        },
+        {
+          "dir": "ch05_multihead",
+          "title": "Multi-head attention",
+          "writes": "The version with a loop, and the vectorized version",
+          "module": "multihead",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        },
+        {
+          "dir": "ch06_block",
+          "title": "The transformer block",
+          "writes": "The feed-forward layer, GELU, pre-LN, the residual path",
+          "module": "block",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        },
+        {
+          "dir": "ch07_gpt2",
+          "title": "The complete model",
+          "writes": "GPT-2, with weight tying and the original initialization",
+          "module": "gpt2",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        },
+        {
+          "dir": "ch08_training",
+          "title": "The training loop",
+          "writes": "AdamW, warmup, cosine schedule, sampling",
+          "module": "training",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "title": "Mixture of Experts",
+      "blurb": "The router, the collapse that follows it, and the machinery that prevents the collapse.",
+      "chapters": [
+        {
+          "dir": "ch09_moe",
+          "title": "The first MoE layer",
+          "writes": "The router, top-k selection, the weighted combination",
+          "module": "moe",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        },
+        {
+          "dir": "ch10_balance",
+          "title": "The collapse problem",
+          "writes": "Expert use metrics, the auxiliary loss, the router z-loss",
+          "module": "balance",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        },
+        {
+          "dir": "ch11_capacity",
+          "title": "Capacity and dispatch",
+          "writes": "The capacity factor, token drop, a vectorized dispatch",
+          "module": "capacity",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        },
+        {
+          "dir": "ch12_compare",
+          "title": "Dense against sparse",
+          "writes": "The experiment, and the comparison at equal active parameters",
+          "module": "compare",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        },
+        {
+          "dir": "ch13_ablations",
+          "title": "Ablations",
+          "writes": "Top-1 against top-2, the number of experts, no auxiliary loss",
+          "module": "ablations",
+          "exists": false,
+          "promoted": false,
+          "tests": [],
+          "tests_total": 0,
+          "tests_passed": 0,
+          "status": "planned"
+        }
+      ]
+    }
+  ]
+}
