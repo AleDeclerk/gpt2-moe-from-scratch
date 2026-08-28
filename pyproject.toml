@@ -1,0 +1,23 @@
+[project]
+name = "gpt2-moe-from-scratch"
+version = "0.1.0"
+description = "Build GPT-2 and a Mixture-of-Experts variant from scratch, one exercise at a time."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "torch>=2.6",
+    "numpy>=2.0",
+    "tiktoken>=0.8",
+    "matplotlib>=3.9",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["chapters"]
+python_files = ["test_*.py"]
+markers = [
+    "slow: needs a network download or more than 30 seconds",
+]
+addopts = "-q --import-mode=importlib"
