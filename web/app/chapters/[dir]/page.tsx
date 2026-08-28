@@ -10,6 +10,7 @@ import {
   getChapterReadme,
   getProgress,
 } from "@/lib/course";
+import { formasBuscables, leerGlosario } from "@/lib/glosario";
 import { renderMarkdown, stripFirstHeading } from "@/lib/markdown";
 
 type Props = { params: Promise<{ dir: string }> };
@@ -41,7 +42,8 @@ export default async function ChapterPage({ params }: Props) {
   const chapters = getAllChapters();
   const previous = index > 0 ? chapters[index - 1] : null;
   const next = index < chapters.length - 1 ? chapters[index + 1] : null;
-  const html = await renderMarkdown(stripFirstHeading(source));
+  const { terminos } = leerGlosario();
+  const html = await renderMarkdown(stripFirstHeading(source), formasBuscables(terminos));
 
   return (
     <main className="mx-auto max-w-[1120px] px-6 pb-24">

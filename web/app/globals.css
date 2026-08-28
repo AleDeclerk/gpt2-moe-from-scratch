@@ -141,6 +141,20 @@ a {
   text-decoration-color: var(--color-accent);
 }
 
+/* Los enlaces al glosario aparecen solos en el texto, así que tienen que
+   notarse menos que un enlace que el autor puso a propósito. */
+.prose a.termino {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-decoration-color: #6bbecf70;
+  text-underline-offset: 4px;
+}
+
+.prose a.termino:hover {
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
+}
+
 .prose ul,
 .prose ol {
   padding-left: 1.35em;

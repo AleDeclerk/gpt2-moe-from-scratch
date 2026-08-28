@@ -42,6 +42,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               gpt2-moe
             </Link>
             <div className="flex items-center gap-5 text-faint">
+              <Link href="/intro" className="transition-colors hover:text-accent">
+                intro
+              </Link>
+              <Link href="/glosario" className="transition-colors hover:text-accent">
+                glosario
+              </Link>
               <span>
                 <span className="text-dim tabular-nums">
                   {totals.tests_passed}/{totals.tests_total}

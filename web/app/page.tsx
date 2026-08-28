@@ -36,6 +36,20 @@ export default function Home() {
             que hay detrás de Mixtral y DeepSeek. Escribís cada función a mano,
             y pytest define la condición para pasar.
           </p>
+          <div className="rise mt-9" style={{ "--i": 3 } as React.CSSProperties}>
+            <a
+              href="/intro"
+              className="inline-block border border-rule px-5 py-3 text-[11px] tracking-[0.16em] uppercase transition-colors hover:border-accent hover:text-accent"
+            >
+              Empezá por acá &#8594;
+            </a>
+            <a
+              href="/glosario"
+              className="ml-3 inline-block px-2 py-3 text-[11px] tracking-[0.16em] text-faint uppercase transition-colors hover:text-accent"
+            >
+              Glosario
+            </a>
+          </div>
         </div>
 
         {/* ---- el instrumento ---- */}

@@ -5,17 +5,27 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
+import { rehypeGlossaryLinks } from "./glossaryLinks";
 
-/** Renderiza a HTML el markdown de un capítulo, en tiempo de build.
+/** Pasar a HTML el markdown de un capítulo, en tiempo de build.
  *
- * La fuente es un archivo de este repo, así que el contenido es confiable.
+ * La fuente es un archivo de este mismo repositorio, así que el contenido es
+ * confiable.
+ *
+ * Si se le pasan las formas del glosario, enlaza la primera aparición de cada
+ * término. La página del glosario no las pasa, para no enlazarse a sí misma.
  */
-export async function renderMarkdown(source: string): Promise<string> {
-  const file = await unified()
-    .use(remarkParse)
-    .use(remarkGfm)
-    .use(remarkRehype)
-    .use(rehypeSlug)
+export async function renderMarkdown(
+  source: string,
+  formasDelGlosario: { forma: string; slug: string }[] = [],
+): Promise<string> {
+  let pipeline = unified().use(remarkParse).use(remarkGfm).use(remarkRehype).use(rehypeSlug);
+
+  if (formasDelGlosario.length > 0) {
+    pipeline = pipeline.use(rehypeGlossaryLinks, { formas: formasDelGlosario });
+  }
+
+  const file = await pipeline
     .use(rehypePrettyCode, {
       theme: "vitesse-dark",
       keepBackground: false,
@@ -26,7 +36,7 @@ export async function renderMarkdown(source: string): Promise<string> {
   return String(file);
 }
 
-/** Saca el primer heading, porque la página ya muestra el título en su header. */
+/** Sacar el primer título, porque la página ya lo muestra en su encabezado. */
 export function stripFirstHeading(source: string): string {
   return source.replace(/^#\s+.*\n+/, "");
 }
