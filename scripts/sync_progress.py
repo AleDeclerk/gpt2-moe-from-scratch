@@ -1,12 +1,14 @@
-"""Measure the real progress of the course, and write progress.json.
+"""Mide el progreso real del curso, y escribe progress.json.
 
-The website reads that file. The numbers come from a test run, so the site
-cannot say that a chapter is complete while the tests fail.
+El sitio web lee ese archivo. Los números salen de una corrida de tests, así
+que el sitio no puede decir que un capítulo está terminado mientras los tests
+fallan.
 
     uv run python scripts/sync_progress.py
 
-The run uses MOE_TARGET=exercise, so it measures your code, not the reference.
-Tests with the mark `slow` stay out, because they need a network download.
+La corrida usa MOE_TARGET=exercise, así que mide tu código, no el de
+referencia. Los tests con la marca `slow` quedan afuera, porque necesitan bajar
+datos de la red.
 """
 
 from __future__ import annotations
@@ -28,10 +30,10 @@ OUTPUT = ROOT / "progress.json"
 
 
 def run_chapter_tests(chapter: Path) -> list[dict]:
-    """Run the tests of one chapter, and get the result of each one.
+    """Corre los tests de un capítulo, y devuelve el resultado de cada uno.
 
-    Returns:
-        A list of dicts with the keys `name` and `passed`.
+    Devuelve:
+        Una lista de dicts con las claves `name` y `passed`.
     """
     env = os.environ.copy()
     env["MOE_TARGET"] = "exercise"
@@ -57,8 +59,8 @@ def run_chapter_tests(chapter: Path) -> list[dict]:
         tree = ElementTree.parse(report)
         results = []
         for case in tree.iter("testcase"):
-            # A case without a child element passed. A failure, an error, or a
-            # skip adds a child, so the test does not count as green.
+            # Un caso sin elemento hijo pasó. Un fallo, un error o un skip
+            # agregan un hijo, así que ese test no cuenta como verde.
             failed = any(
                 case.find(tag) is not None
                 for tag in ("failure", "error", "skipped")
@@ -68,7 +70,7 @@ def run_chapter_tests(chapter: Path) -> list[dict]:
 
 
 def status_of(exists: bool, passed: int, total: int) -> str:
-    """Get the state of one chapter from its test results."""
+    """Devuelve el estado de un capítulo a partir de sus resultados de tests."""
     if not exists:
         return "planned"
     if total == 0 or passed == 0:
@@ -86,8 +88,8 @@ def main() -> None:
     missing = present - known
     if missing:
         sys.exit(
-            f"These chapter directories are not in the manifest: {sorted(missing)}.\n"
-            f"Add them to {MANIFEST}, so the website can show them."
+            f"Estos directorios de capítulo no están en el manifest: {sorted(missing)}.\n"
+            f"Agregalos a {MANIFEST}, así el sitio web puede mostrarlos."
         )
 
     parts = []
@@ -138,8 +140,8 @@ def main() -> None:
         "parts": parts,
     }
     OUTPUT.write_text(json.dumps(document, indent=2) + "\n")
-    print(f"\nOK. {tests_passed}/{tests_total} tests, {chapters_done}/{chapters_total} chapters done.")
-    print(f"Written to {OUTPUT}")
+    print(f"\nOK. {tests_passed}/{tests_total} tests, {chapters_done}/{chapters_total} capítulos terminados.")
+    print(f"Escrito en {OUTPUT}")
 
 
 if __name__ == "__main__":

@@ -1,57 +1,58 @@
-"""Chapter 2 — Byte Pair Encoding.
+"""Capítulo 2: Byte Pair Encoding.
 
-Write the two functions and the class. Read README.md first.
-Start with get_stats and merge, because train and encode both use them.
+Escribí las dos funciones y la clase. Leé primero README.md.
+Arrancá por get_stats y merge, porque train y encode usan las dos.
 """
 
 from __future__ import annotations
 
 
 def get_stats(ids: list[int]) -> dict[tuple[int, int], int]:
-    """Count how many times each pair of adjacent tokens is present.
+    """Cuenta cuántas veces aparece cada par de tokens adyacentes.
 
-    Args:
-        ids: a list of token identifiers.
+    Argumentos:
+        ids: una lista de identificadores de token.
 
-    Returns:
-        A dict from a pair (a, b) to the number of times it is present.
-        A list with less than two elements gives an empty dict.
+    Devuelve:
+        Un dict del par (a, b) a la cantidad de veces que aparece.
+        Una lista con menos de dos elementos da un dict vacío.
 
-    Example:
+    Ejemplo:
         get_stats([1, 2, 1, 2, 3]) == {(1, 2): 2, (2, 1): 1, (2, 3): 1}
     """
     raise NotImplementedError("get_stats")
 
 
 def merge(ids: list[int], pair: tuple[int, int], new_id: int) -> list[int]:
-    """Replace every occurrence of `pair` with `new_id`.
+    """Reemplaza cada aparición de `pair` por `new_id`.
 
-    Args:
-        ids: a list of token identifiers.
-        pair: the two adjacent identifiers to replace.
-        new_id: the identifier of the new token.
+    Argumentos:
+        ids: una lista de identificadores de token.
+        pair: los dos identificadores adyacentes que hay que reemplazar.
+        new_id: el identificador del token nuevo.
 
-    Returns:
-        A new list. The input list does not change.
+    Devuelve:
+        Una lista nueva. La lista de entrada no cambia.
 
-    Example:
+    Ejemplo:
         merge([1, 2, 1, 2, 3], (1, 2), 9) == [9, 9, 3]
         merge([1, 1, 1], (1, 1), 9) == [9, 1]
 
-    Rules:
-        Read the note about the overlap in README.md. The second example above
-        is the case that a careless loop gets wrong.
+    Reglas:
+        Leé la nota sobre el solapamiento en README.md. El segundo ejemplo de
+        acá arriba es el caso que un loop descuidado resuelve mal.
     """
     raise NotImplementedError("merge")
 
 
 class BPETokenizer:
-    """A byte-level BPE tokenizer.
+    """Un tokenizador BPE a nivel de bytes.
 
-    Attributes:
-        merges: a dict from a pair (a, b) to the identifier of the new token.
-            The insertion order is the order of the merges, and encode needs it.
-        vocab: a dict from an identifier to the bytes that it represents.
+    Atributos:
+        merges: un dict del par (a, b) al identificador del token nuevo.
+            El orden de inserción es el orden de los merges, y encode lo
+            necesita.
+        vocab: un dict del identificador a los bytes que representa.
     """
 
     def __init__(self) -> None:
@@ -59,34 +60,34 @@ class BPETokenizer:
         self.vocab: dict[int, bytes] = {i: bytes([i]) for i in range(256)}
 
     def train(self, text: str, vocab_size: int) -> None:
-        """Learn the merges from a corpus.
+        """Aprende los merges a partir de un corpus.
 
-        Args:
-            text: the training corpus.
-            vocab_size: the size of the final vocabulary. The value must be
-                256 or more, because the 256 bytes are always present.
+        Argumentos:
+            text: el corpus de entrenamiento.
+            vocab_size: el tamaño del vocabulario final. Tiene que ser 256 o
+                más, porque los 256 bytes están siempre.
 
-        Raises:
-            ValueError: if vocab_size is less than 256.
+        Lanza:
+            ValueError: si vocab_size es menor que 256.
 
-        The method does vocab_size - 256 merges. If the text is too short and
-        no pair is left, the method stops early.
+        El método hace vocab_size - 256 merges. Si el texto es muy corto y no
+        queda ningún par, corta antes.
 
-        After the method, self.merges and self.vocab hold the result.
+        Cuando termina, self.merges y self.vocab tienen el resultado.
         """
         raise NotImplementedError("BPETokenizer.train")
 
     def encode(self, text: str) -> list[int]:
-        """Map a string to a list of token identifiers.
+        """Convierte un string en una lista de identificadores de token.
 
-        The merges must go in the same order as during the training. Of all
-        the pairs that are present, take the pair with the lowest merge index.
+        Los merges tienen que ir en el mismo orden que en el entrenamiento. De
+        todos los pares que aparecen, tomá el de índice de merge más bajo.
         """
         raise NotImplementedError("BPETokenizer.encode")
 
     def decode(self, ids: list[int]) -> str:
-        """Map a list of token identifiers back to a string.
+        """Convierte una lista de identificadores de token de vuelta a string.
 
-        Use errors="replace" for the UTF-8 decode. README.md explains why.
+        Usá errors="replace" en el decode UTF-8. README.md explica por qué.
         """
         raise NotImplementedError("BPETokenizer.decode")

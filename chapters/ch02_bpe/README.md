@@ -1,115 +1,115 @@
-# Chapter 2 — Byte Pair Encoding
+# Capítulo 2: Byte Pair Encoding
 
-## Why not characters
+## Por qué no alcanza con los caracteres
 
-The tokenizer of Chapter 1 has two problems, and both come from the same
-decision. It builds the vocabulary from the characters of one corpus.
+El tokenizador del capítulo 1 tiene dos problemas, y los dos salen de la misma
+decisión: armar el vocabulario con los caracteres de un solo corpus.
 
-The first problem is coverage. A character that is not present in Tiny
-Shakespeare has no identifier, so `encode` raises a KeyError. The letter `ñ`,
-an emoji, and a Chinese character all fail.
+El primer problema es la cobertura. Un carácter que no aparece en Tiny
+Shakespeare no tiene identificador, así que `encode` tira un KeyError. La letra
+`ñ`, un emoji y un carácter chino fallan igual.
 
-The second problem is length. One character gives one token, so the model
-needs a long context for a short text. Attention has a cost that grows with
-the square of the sequence length, so length is expensive.
+El segundo problema es el largo. Un carácter da un token, así que el modelo
+necesita un contexto largo para un texto corto. El costo de attention crece con
+el cuadrado del largo de la secuencia, o sea que el largo se paga caro.
 
-BPE solves both. GPT-2 uses it, and the vocabulary has 50257 tokens.
+BPE resuelve los dos. GPT-2 lo usa, y su vocabulario tiene 50257 tokens.
 
-## 1. Bytes as the base vocabulary
+## 1. Los bytes como vocabulario base
 
-BPE does not start from characters. It starts from bytes.
+BPE no arranca de los caracteres. Arranca de los bytes.
 
-Every text has a UTF-8 representation, and every UTF-8 byte is a number
-between 0 and 255. So a base vocabulary of 256 tokens can represent any text
-in any language, with no unknown token. This property is the reason for the
-choice.
+Todo texto tiene una representación en UTF-8, y todo byte UTF-8 es un número
+entre 0 y 255. Con eso, un vocabulario base de 256 tokens alcanza para
+representar cualquier texto en cualquier idioma, sin token desconocido. Esa
+propiedad es la razón de la elección.
 
 ```python
 "hola".encode("utf-8")   # b'hola'        -> [104, 111, 108, 97]
 "ñ".encode("utf-8")      # b'\xc3\xb1'    -> [195, 177]
 ```
 
-The second line shows the cost. One character became two tokens. BPE gets that
-cost back with the merges.
+La segunda línea muestra el costo: un carácter se convirtió en dos tokens. BPE
+recupera ese costo con los merges.
 
-## 2. The training algorithm
+## 2. El algoritmo de entrenamiento
 
-The algorithm has three steps, and it repeats them:
+El algoritmo tiene tres pasos y los repite:
 
-1. Count how many times each pair of adjacent tokens is present.
-2. Take the most frequent pair, and give it a new identifier.
-3. Replace every occurrence of that pair with the new identifier.
+1. Contá cuántas veces aparece cada par de tokens adyacentes.
+2. Agarrá el par más frecuente y dale un identificador nuevo.
+3. Reemplazá cada aparición de ese par por el identificador nuevo.
 
-An example with the word `aaabdaaabac`, as bytes:
+Un ejemplo con la palabra `aaabdaaabac`, en bytes:
 
 ```
-start        a a a b d a a a b a c
-most frequent pair: (a, a), 4 times.  Z = aa
-after merge  Z a b d Z a b a c
-most frequent pair: (Z, a), 2 times.  Y = Za
-after merge  Y b d Y b a c
-most frequent pair: (Y, b), 2 times.  X = Yb
-after merge  X d X a c
+inicio          a a a b d a a a b a c
+par más frecuente: (a, a), 4 veces.  Z = aa
+tras el merge   Z a b d Z a b a c
+par más frecuente: (Z, a), 2 veces.  Y = Za
+tras el merge   Y b d Y b a c
+par más frecuente: (Y, b), 2 veces.  X = Yb
+tras el merge   X d X a c
 ```
 
-Eleven tokens became five. The vocabulary grew from 4 to 7. This is the trade
-of BPE, and the argument `vocab_size` controls it.
+Los once tokens se volvieron cinco. El vocabulario pasó de 4 a 7. Ese es el
+trade-off de BPE, y el argumento `vocab_size` lo controla.
 
-**Watch the overlap.** In `[1, 1, 1]` the pair `(1, 1)` is present two times,
-but a merge can replace only one of them. The result is `[Z, 1]`, not `[Z, Z]`
-and not `[Z]`. A loop with an explicit index handles this. A call to
-`list.replace` does not.
+**Ojo con el solapamiento.** En `[1, 1, 1]` el par `(1, 1)` aparece dos veces,
+pero un merge puede reemplazar solo uno. El resultado es `[Z, 1]`, no `[Z, Z]`
+ni `[Z]`. Un loop con un índice explícito lo maneja bien. Una llamada a
+`list.replace`, no.
 
-## 3. Encode needs the order of the merges
+## 3. encode necesita el orden de los merges
 
-The merges are not a set. They are an ordered list, and `encode` must apply
-them in the same order as `train`.
+Los merges no son un conjunto. Son una lista ordenada, y `encode` tiene que
+aplicarlos en el mismo orden que `train`.
 
-The reason is that later merges are built from earlier merges. The token `X`
-in the example above means `aaab`, but only because `Y` and `Z` exist already.
-An `encode` that applies `X` first gets a different result, and the model
-never saw those identifiers during training.
+La razón es que los merges de después se construyen sobre los de antes. El
+token `X` del ejemplo de arriba significa `aaab`, pero solo porque `Y` y `Z` ya
+existen. Un `encode` que aplique `X` primero da otro resultado, y el modelo
+nunca vio esos identificadores durante el entrenamiento.
 
-So `encode` repeats one step: of all the pairs that are present in the current
-list, find the pair with the lowest merge index, and apply it. Stop when no
-pair of the list is in the merge table.
+Entonces `encode` repite un solo paso: de todos los pares que aparecen en la
+lista actual, buscá el de menor índice de merge y aplicalo. Frená cuando ningún
+par de la lista esté en la tabla de merges.
 
-## 4. What decode must survive
+## 4. Lo que decode tiene que aguantar
 
-`decode` concatenates the bytes of each token, and then decodes UTF-8. A
-random list of identifiers can give a byte sequence that is not valid UTF-8,
-because a multi-byte character can be cut in the middle. During generation the
-model can produce exactly that.
+`decode` concatena los bytes de cada token y después decodifica UTF-8. Una
+lista cualquiera de identificadores puede dar una secuencia de bytes que no sea
+UTF-8 válido, porque un carácter de varios bytes puede quedar cortado por la
+mitad. Durante la generación, el modelo puede producir justo eso.
 
-The standard answer is `errors="replace"`, which puts the character `U+FFFD`
-in place of the invalid bytes. The alternative, an exception, stops the
-generation of the model for a reason that is not interesting.
+La respuesta estándar es `errors="replace"`, que pone el carácter `U+FFFD`
+donde estaban los bytes inválidos. La alternativa, una excepción, corta la
+generación del modelo por un motivo que no tiene ningún interés.
 
-## Your task
+## Tu tarea
 
-1. Open `exercise.py`.
-2. Write `get_stats`, `merge`, and the three methods of `BPETokenizer`.
-3. Run the tests.
+1. Abrí `exercise.py`.
+2. Escribí `get_stats`, `merge` y los tres métodos de `BPETokenizer`.
+3. Corré los tests.
 
 ```bash
 uv run pytest chapters/ch02_bpe
 ```
 
-4. Promote the code.
+4. Promové el código.
 
 ```bash
 uv run python scripts/promote.py ch02
 ```
 
-The two functions come first, because `train` and `encode` both use them. Get
-them green before you start the class.
+Las dos funciones van primero, porque `train` y `encode` las usan. Ponelas en
+verde antes de arrancar con la clase.
 
-## Questions to answer for yourself
+## Preguntas para responderte a vos mismo
 
-- Train the tokenizer on Tiny Shakespeare with `vocab_size = 512`, and measure
-  the compression. The test `test_compression_ratio` prints the number.
-- The real GPT-2 tokenizer splits the text with a regular expression before
-  BPE, so a merge never crosses a word boundary. What breaks without that
-  step? Look at what `" the"`, `" the."`, and `" the,"` become.
-- The vocabulary of GPT-2 has 50257 tokens. The number is 256 bytes, plus
-  50000 merges, plus one. What is the last one, and why does a model need it?
+- Entrená el tokenizador con Tiny Shakespeare y `vocab_size = 512`, y medí la
+  compresión. El test `test_compression_ratio` imprime el número.
+- El tokenizador real de GPT-2 corta el texto con una expresión regular antes
+  de BPE, así que un merge nunca cruza el límite de una palabra. ¿Qué se rompe
+  sin ese paso? Fijate en qué se convierten `" the"`, `" the."` y `" the,"`.
+- El vocabulario de GPT-2 tiene 50257 tokens: son 256 bytes, más 50000 merges,
+  más uno. ¿Cuál es ese último, y para qué lo necesita un modelo?

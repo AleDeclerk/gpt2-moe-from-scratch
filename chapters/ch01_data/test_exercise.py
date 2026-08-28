@@ -1,4 +1,4 @@
-"""Tests for Chapter 1.
+"""Tests del capítulo 1.
 
     uv run pytest chapters/ch01_data
 """
@@ -14,7 +14,7 @@ def generator():
     return torch.Generator().manual_seed(1337)
 
 
-# --- the tokenizer ---------------------------------------------------------
+# --- el tokenizador --------------------------------------------------------
 
 
 def test_vocabulary_is_sorted_and_complete(target):
@@ -31,24 +31,24 @@ def test_encode_and_decode_are_inverse(target):
 def test_encode_gives_valid_identifiers(target):
     tokenizer = target.CharTokenizer.from_text(TEXT)
     ids = tokenizer.encode(TEXT)
-    assert len(ids) == len(TEXT), "one identifier for each character"
+    assert len(ids) == len(TEXT), "un identificador por cada carácter"
     assert all(0 <= i < tokenizer.vocab_size for i in ids)
 
 
 def test_vocabulary_does_not_depend_on_the_order_of_the_text(target):
-    """A saved model holds identifiers, so the map must be stable."""
+    """Un modelo guardado tiene identificadores, así que el mapa no puede moverse."""
     first = target.CharTokenizer.from_text("abc")
     second = target.CharTokenizer.from_text("cba")
     assert first.stoi == second.stoi
 
 
-# --- the split -------------------------------------------------------------
+# --- el split --------------------------------------------------------------
 
 
 def test_split_keeps_every_element_in_order(target):
     data = torch.arange(100)
     train, val = target.train_val_split(data, val_fraction=0.1)
-    assert torch.equal(torch.cat([train, val]), data), "the split must be contiguous"
+    assert torch.equal(torch.cat([train, val]), data), "el split tiene que ser contiguo"
 
 
 def test_split_uses_the_end_for_validation(target):
@@ -66,7 +66,7 @@ def test_split_accepts_another_fraction(target):
     assert len(val) == 250
 
 
-# --- the batch -------------------------------------------------------------
+# --- el batch --------------------------------------------------------------
 
 
 def test_batch_has_the_correct_shape_and_type(target, generator):
@@ -79,7 +79,7 @@ def test_batch_has_the_correct_shape_and_type(target, generator):
 
 
 def test_target_is_the_input_moved_one_position(target, generator):
-    """This is the whole idea of the chapter, so the test is explicit."""
+    """Esta es la idea central del capítulo, así que el test lo dice explícito."""
     data = torch.arange(500)
     x, y = target.get_batch(data, batch_size=16, block_size=8, generator=generator)
     torch.testing.assert_close(y[:, :-1], x[:, 1:])
@@ -98,20 +98,20 @@ def test_a_fixed_seed_gives_the_same_batch(target):
     data = torch.arange(500)
     first = target.get_batch(data, 4, 8, torch.Generator().manual_seed(42))
     second = target.get_batch(data, 4, 8, torch.Generator().manual_seed(42))
-    assert torch.equal(first[0], second[0]), "pass `generator` to torch.randint"
+    assert torch.equal(first[0], second[0]), "pasale `generator` a torch.randint"
     assert torch.equal(first[1], second[1])
 
 
 def test_the_last_block_is_reachable(target):
-    """With one valid offset, the batch must use the final token of the data.
+    """Con un único offset válido, el batch tiene que llegar al último token.
 
-    An offset drawn from len(data) is too large and breaks here. An offset
-    drawn from len(data) - block_size - 1 is too small and also breaks here.
+    Un offset sacado de len(data) es demasiado grande y rompe acá. Uno sacado
+    de len(data) - block_size - 1 es demasiado chico y también rompe acá.
     """
     data = torch.arange(20)
     x, y = target.get_batch(data, batch_size=3, block_size=19)
     assert x[0, 0].item() == 0
-    assert y[0, -1].item() == 19, "y must reach the last token of the data"
+    assert y[0, -1].item() == 19, "y tiene que llegar al último token de los datos"
 
 
 def test_no_index_leaves_the_data(target, generator):

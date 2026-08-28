@@ -6,9 +6,9 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 
-/** Render the markdown of a chapter to HTML, at build time.
+/** Renderiza a HTML el markdown de un capítulo, en tiempo de build.
  *
- * The source is a file of this repository, so the content is trusted.
+ * La fuente es un archivo de este repo, así que el contenido es confiable.
  */
 export async function renderMarkdown(source: string): Promise<string> {
   const file = await unified()
@@ -26,7 +26,7 @@ export async function renderMarkdown(source: string): Promise<string> {
   return String(file);
 }
 
-/** Remove the first heading, because the page shows the title in its header. */
+/** Saca el primer heading, porque la página ya muestra el título en su header. */
 export function stripFirstHeading(source: string): string {
   return source.replace(/^#\s+.*\n+/, "");
 }

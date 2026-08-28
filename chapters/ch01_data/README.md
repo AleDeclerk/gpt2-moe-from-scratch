@@ -1,61 +1,61 @@
-# Chapter 1 — The data pipeline
+# Capítulo 1: el pipeline de datos
 
-## What a language model learns
+## Qué aprende un modelo de lenguaje
 
-The task is one sentence long: given the text until now, give a probability to
-each token that can come next. Everything else in this course is machinery for
-that one question.
+La tarea entra en una sola frase: dado el texto hasta acá, asignarle una
+probabilidad a cada token que puede venir después. Todo el resto del curso es
+maquinaria para esa única pregunta.
 
-So the training data is not a table of inputs and labels. It is one long
-sequence of tokens, and the label of every position is the token at the next
-position. The dataset writes itself, and this is why the method is called
-self-supervised.
+Por eso los datos de entrenamiento no son una tabla de entradas y etiquetas.
+Son una sola secuencia larga de tokens, y la etiqueta de cada posición es el
+token de la posición siguiente. El dataset se escribe solo, y de ahí sale el
+nombre del método: self-supervised.
 
-## 1. A character tokenizer
+## 1. Un tokenizador de caracteres
 
-A tokenizer maps text to integers. The simplest version uses one integer per
-character. Take the set of characters in the corpus, sort them, and use the
-position in that sorted list as the identifier.
+Un tokenizador mapea texto a enteros. La versión más simple usa un entero por
+carácter. Tomás el conjunto de caracteres del corpus, lo ordenás, y usás la
+posición en esa lista ordenada como identificador.
 
-Tiny Shakespeare has 65 different characters, so the vocabulary is 65 tokens.
-This is a very small vocabulary. GPT-2 uses 50257 tokens, and Chapter 2 builds
-that kind of tokenizer with the BPE algorithm.
+Tiny Shakespeare tiene 65 caracteres distintos, así que el vocabulario es de 65
+tokens. Es un vocabulario muy chico. GPT-2 usa 50257 tokens, y el capítulo 2
+construye un tokenizador de ese tipo con el algoritmo BPE.
 
-The two sizes trade against each other:
+Los dos tamaños se compensan entre sí:
 
-| | Character tokens | BPE tokens |
+| | Tokens de caracteres | Tokens BPE |
 |---|---|---|
-| Vocabulary | 65 | 50257 |
-| Tokens for the same text | many | about 4 times less |
-| Embedding table | small | large |
-| Context of 256 tokens holds | about 256 characters | about 1000 characters |
+| Vocabulario | 65 | 50257 |
+| Tokens para el mismo texto | muchos | unas 4 veces menos |
+| Tabla de embedding | chica | grande |
+| Un contexto de 256 tokens abarca | unos 256 caracteres | unos 1000 caracteres |
 
-A small vocabulary gives long sequences, and attention has a cost that grows
-with the square of the sequence length. A large vocabulary gives short
-sequences, but a large embedding table and a large output layer.
+Un vocabulario chico da secuencias largas, y el costo de attention crece con el
+cuadrado del largo de la secuencia. Un vocabulario grande da secuencias cortas,
+pero también una tabla de embedding grande y una capa de salida grande.
 
-**The sort matters.** Two runs must give the same identifier to the same
-character, because a saved model holds the identifiers, not the characters.
-`sorted(set(text))` is stable. `set(text)` alone is not.
+**El orden importa.** Dos corridas tienen que darle el mismo identificador al
+mismo carácter, porque un modelo guardado guarda los identificadores, no los
+caracteres. `sorted(set(text))` es estable. `set(text)` solo, no.
 
-## 2. The train and validation split
+## 2. El split de entrenamiento y validación
 
-The course keeps the last 10 percent of the text for validation, and the split
-is contiguous. A random split of positions is wrong here, and the reason is
-specific to sequence data.
+El curso reserva el último 10 por ciento del texto para validación, y el split
+es contiguo. Un split aleatorio de posiciones acá está mal, y la razón es propia
+de los datos secuenciales.
 
-The training examples are windows over the text, and the windows overlap. A
-random split puts the window at position 100 in the training set. It puts the
-window at position 101 in the validation set. The two
-windows share 255 of their 256 characters. The validation loss then measures
-memory, not generalization, and it looks much better than the truth.
+Los ejemplos de entrenamiento son ventanas sobre el texto, y las ventanas se
+superponen. Un split aleatorio manda la ventana de la posición 100 al conjunto
+de entrenamiento, y la ventana de la posición 101 al conjunto de validación. Las
+dos ventanas comparten 255 de sus 256 caracteres. Así el loss de validación mide
+memoria, no generalización, y se ve mucho mejor de lo que realmente es.
 
-## 3. One batch, many examples
+## 3. Un batch, muchos ejemplos
 
-This is the part that surprises people. A block of 256 tokens is not one
-training example. It is 256 training examples in one tensor.
+Esta es la parte que sorprende. Un bloque de 256 tokens no es un ejemplo de
+entrenamiento. Son 256 ejemplos de entrenamiento en un solo tensor.
 
-Take the block `[F, i, r, s, t]`. The model sees this:
+Tomá el bloque `[F, i, r, s, t]`. El modelo ve esto:
 
 ```
 input                 target
@@ -65,47 +65,48 @@ input                 target
 [F, i, r, s]       -> t
 ```
 
-The causal mask of Chapter 4 makes all four predictions in one forward pass.
-Position `t` can read positions `0` up to `t`, and nothing after. So
-the code does not build the four rows above. The code builds two tensors:
+La máscara causal del capítulo 4 hace las cuatro predicciones en un solo
+forward. La posición `t` puede leer las posiciones de `0` hasta `t`, y nada
+después. Así que el código no construye las cuatro filas de arriba. Construye
+dos tensores:
 
 ```
-x = data[i     : i + T]        the block
-y = data[i + 1 : i + T + 1]    the same block, moved one position
+x = data[i     : i + T]        el bloque
+y = data[i + 1 : i + T + 1]    el mismo bloque, corrido una posición
 ```
 
-Then `y[t]` is the correct answer for the prefix that ends at `x[t]`. One
-tensor of shape `(B, T)` holds `B * T` predictions. With `B = 32` and
-`T = 256`, one step of training uses 8192 examples.
+Entonces `y[t]` es la respuesta correcta para el prefijo que termina en `x[t]`.
+Un tensor de shape `(B, T)` contiene `B * T` predicciones. Con `B = 32` y
+`T = 256`, un paso de entrenamiento usa 8192 ejemplos.
 
-**The consequence for the offset.** The start position `i` must satisfy
-`i + T + 1 <= len(data)`, because `y` reads one position beyond `x`. An offset
-drawn from `len(data) - T` is off by one and fails on the last block.
+**Lo que implica para el offset.** La posición inicial `i` tiene que cumplir
+`i + T + 1 <= len(data)`, porque `y` lee una posición más allá que `x`. Un
+offset sacado de `len(data) - T` se pasa por uno y falla en el último bloque.
 
-## Your task
+## Tu tarea
 
-1. Open `exercise.py`.
-2. Write `CharTokenizer`, `train_val_split`, and `get_batch`.
-3. Run the tests.
+1. Abrí `exercise.py`.
+2. Escribí `CharTokenizer`, `train_val_split` y `get_batch`.
+3. Corré los tests.
 
 ```bash
 uv run pytest chapters/ch01_data
 ```
 
-4. Promote the code.
+4. Promové el código.
 
 ```bash
 uv run python scripts/promote.py ch01
 ```
 
-The tests use a small text of their own, so they do not need a download. To
-get the real corpus for Chapter 8, run `uv run python scripts/get_data.py`.
+Los tests usan un texto chico propio, así que no necesitan bajar nada. Para
+conseguir el corpus real del capítulo 8, corré `uv run python scripts/get_data.py`.
 
-## Questions to answer for yourself
+## Preguntas para responderte a vos mismo
 
-- Tiny Shakespeare has 1115394 characters. How many tokens does the BPE
-  tokenizer of GPT-2 need for the same text? Chapter 2 measures it.
-- With `B = 32` and `T = 256`, how many bytes does one batch use as `int64`?
-  And as `int32`?
-- The validation split is the end of the text. Print the last 500 characters.
-  Is that part of the corpus the same kind of text as the start?
+- Tiny Shakespeare tiene 1115394 caracteres. ¿Cuántos tokens necesita el
+  tokenizador BPE de GPT-2 para ese mismo texto? El capítulo 2 lo mide.
+- Con `B = 32` y `T = 256`, ¿cuántos bytes ocupa un batch en `int64`? ¿Y en
+  `int32`?
+- El split de validación es el final del texto. Imprimí los últimos 500
+  caracteres. ¿Esa parte del corpus es el mismo tipo de texto que el comienzo?

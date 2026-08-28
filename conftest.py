@@ -1,11 +1,11 @@
-"""Test support for the whole course.
+"""Soporte de tests para todo el curso.
 
-Every chapter has two versions of the same module: `exercise.py`, which you
-write, and `solution.py`, the reference. The `target` fixture loads one of
-them. The environment variable MOE_TARGET selects which one.
+Cada capítulo tiene dos versiones del mismo módulo: `exercise.py`, que lo
+escribís vos, y `solution.py`, que es la referencia. El fixture `target` carga
+uno de los dos. La variable de entorno MOE_TARGET elige cuál.
 
-    uv run pytest chapters/ch00_tensors                    # tests your code
-    MOE_TARGET=solution uv run pytest chapters/ch00_tensors  # tests the reference
+    uv run pytest chapters/ch00_tensors                    # testea tu código
+    MOE_TARGET=solution uv run pytest chapters/ch00_tensors  # testea la referencia
 """
 
 import importlib.util
@@ -19,18 +19,18 @@ VALID_TARGETS = ("exercise", "solution")
 
 @pytest.fixture(scope="module")
 def target(request):
-    """Import the module under test from the directory of the test file."""
+    """Importa el módulo bajo test desde el directorio del archivo de test."""
     name = os.environ.get("MOE_TARGET", "exercise")
     if name not in VALID_TARGETS:
-        raise ValueError(f"MOE_TARGET must be one of {VALID_TARGETS}, not {name!r}")
+        raise ValueError(f"MOE_TARGET tiene que ser uno de {VALID_TARGETS}, no {name!r}")
 
     chapter = request.path.parent
     path = chapter / f"{name}.py"
     if not path.exists():
-        pytest.fail(f"{path} does not exist")
+        pytest.fail(f"{path} no existe")
 
-    # A unique module name prevents a collision between chapters, because every
-    # chapter has a file with the same name.
+    # Un nombre de módulo único evita la colisión entre capítulos, porque todos
+    # tienen un archivo que se llama igual.
     unique = f"{chapter.name}__{name}"
     spec = importlib.util.spec_from_file_location(unique, path)
     module = importlib.util.module_from_spec(spec)

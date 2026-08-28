@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-28T20:18:23+00:00",
-  "course": "GPT-2 with Mixture of Experts, from scratch",
+  "generated_at": "2026-08-28T21:27:20+00:00",
+  "course": "GPT-2 con Mixture of Experts, desde cero",
   "repo": "https://github.com/AleDeclerk/gpt2-moe-from-scratch",
   "totals": {
     "chapters_total": 14,
@@ -11,13 +11,13 @@
   },
   "parts": [
     {
-      "title": "The base",
-      "blurb": "The operations that every later chapter uses, and the data that feeds them.",
+      "title": "La base",
+      "blurb": "Las operaciones que usan todos los cap\u00edtulos que vienen despu\u00e9s, y los datos que las alimentan.",
       "chapters": [
         {
           "dir": "ch00_tensors",
-          "title": "Tensors, softmax, gradients",
-          "writes": "A stable softmax, cross entropy, a backward pass by hand",
+          "title": "Tensores, softmax, gradientes",
+          "writes": "Un softmax estable, cross entropy, un backward hecho a mano",
           "module": "tensors",
           "exists": true,
           "promoted": false,
@@ -61,8 +61,8 @@
         },
         {
           "dir": "ch01_data",
-          "title": "The data pipeline",
-          "writes": "A character tokenizer, the split, the batch sampler",
+          "title": "El pipeline de datos",
+          "writes": "Un tokenizador de caracteres, el split, el sampler de batches",
           "module": "data",
           "exists": true,
           "promoted": false,
@@ -127,7 +127,7 @@
         {
           "dir": "ch02_bpe",
           "title": "Byte Pair Encoding",
-          "writes": "The BPE algorithm, and a comparison against tiktoken",
+          "writes": "El algoritmo de BPE, y una comparaci\u00f3n contra tiktoken",
           "module": "bpe",
           "exists": true,
           "promoted": false,
@@ -208,13 +208,13 @@
       ]
     },
     {
-      "title": "The transformer",
-      "blurb": "From a bigram baseline to a model that reproduces the logits of the real GPT-2.",
+      "title": "El transformer",
+      "blurb": "De un baseline de bigramas a un modelo que reproduce los logits del GPT-2 real.",
       "chapters": [
         {
           "dir": "ch03_embeddings",
-          "title": "Embeddings and a baseline",
-          "writes": "A bigram model, and the first sanity check at log(V)",
+          "title": "Embeddings y un baseline",
+          "writes": "Un modelo de bigramas, y el primer chequeo de cordura en log(V)",
           "module": "embeddings",
           "exists": false,
           "promoted": false,
@@ -226,7 +226,7 @@
         {
           "dir": "ch04_attention",
           "title": "Self-attention",
-          "writes": "One head, the causal mask, the scale of 1/sqrt(d)",
+          "writes": "Una cabeza, la m\u00e1scara causal, la escala de 1/sqrt(d)",
           "module": "attention",
           "exists": false,
           "promoted": false,
@@ -238,7 +238,7 @@
         {
           "dir": "ch05_multihead",
           "title": "Multi-head attention",
-          "writes": "The version with a loop, and the vectorized version",
+          "writes": "La versi\u00f3n con loop, y la versi\u00f3n vectorizada",
           "module": "multihead",
           "exists": false,
           "promoted": false,
@@ -249,8 +249,8 @@
         },
         {
           "dir": "ch06_block",
-          "title": "The transformer block",
-          "writes": "The feed-forward layer, GELU, pre-LN, the residual path",
+          "title": "El bloque del transformer",
+          "writes": "La capa feed-forward, GELU, pre-LN, el camino residual",
           "module": "block",
           "exists": false,
           "promoted": false,
@@ -261,8 +261,8 @@
         },
         {
           "dir": "ch07_gpt2",
-          "title": "The complete model",
-          "writes": "GPT-2, with weight tying and the original initialization",
+          "title": "El modelo completo",
+          "writes": "GPT-2, con weight tying y la inicializaci\u00f3n original",
           "module": "gpt2",
           "exists": false,
           "promoted": false,
@@ -273,8 +273,8 @@
         },
         {
           "dir": "ch08_training",
-          "title": "The training loop",
-          "writes": "AdamW, warmup, cosine schedule, sampling",
+          "title": "El loop de entrenamiento",
+          "writes": "AdamW, warmup, cosine schedule, muestreo",
           "module": "training",
           "exists": false,
           "promoted": false,
@@ -287,12 +287,12 @@
     },
     {
       "title": "Mixture of Experts",
-      "blurb": "The router, the collapse that follows it, and the machinery that prevents the collapse.",
+      "blurb": "El router, el colapso que viene despu\u00e9s, y la maquinaria que lo evita.",
       "chapters": [
         {
           "dir": "ch09_moe",
-          "title": "The first MoE layer",
-          "writes": "The router, top-k selection, the weighted combination",
+          "title": "La primera capa MoE",
+          "writes": "El router, la selecci\u00f3n top-k, la combinaci\u00f3n ponderada",
           "module": "moe",
           "exists": false,
           "promoted": false,
@@ -303,8 +303,8 @@
         },
         {
           "dir": "ch10_balance",
-          "title": "The collapse problem",
-          "writes": "Expert use metrics, the auxiliary loss, the router z-loss",
+          "title": "El problema del colapso",
+          "writes": "M\u00e9tricas de uso de los expertos, el loss auxiliar, el z-loss del router",
           "module": "balance",
           "exists": false,
           "promoted": false,
@@ -315,8 +315,8 @@
         },
         {
           "dir": "ch11_capacity",
-          "title": "Capacity and dispatch",
-          "writes": "The capacity factor, token drop, a vectorized dispatch",
+          "title": "Capacidad y dispatch",
+          "writes": "El factor de capacidad, el descarte de tokens, un dispatch vectorizado",
           "module": "capacity",
           "exists": false,
           "promoted": false,
@@ -327,8 +327,8 @@
         },
         {
           "dir": "ch12_compare",
-          "title": "Dense against sparse",
-          "writes": "The experiment, and the comparison at equal active parameters",
+          "title": "Denso contra sparse",
+          "writes": "El experimento, y la comparaci\u00f3n con la misma cantidad de par\u00e1metros activos",
           "module": "compare",
           "exists": false,
           "promoted": false,
@@ -339,8 +339,8 @@
         },
         {
           "dir": "ch13_ablations",
-          "title": "Ablations",
-          "writes": "Top-1 against top-2, the number of experts, no auxiliary loss",
+          "title": "Ablaciones",
+          "writes": "Top-1 contra top-2, la cantidad de expertos, sin loss auxiliar",
           "module": "ablations",
           "exists": false,
           "promoted": false,

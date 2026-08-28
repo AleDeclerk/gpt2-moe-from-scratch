@@ -1,142 +1,144 @@
-# GPT-2 with Mixture of Experts, from scratch
+# GPT-2 con Mixture of Experts, desde cero
 
-A course in the form of a repository. You write the code, and the tests tell
-you if the code is correct.
+Un curso con forma de repositorio. Vos escribís el código, y los tests te dicen
+si el código está bien.
 
-The course builds two language models. The first one is GPT-2, the dense
-architecture from 2019. The second one replaces each feed-forward block with a
-Mixture of Experts layer. Mixtral, DeepSeek, and most large models of today use
-that architecture. At the end you compare the two, with the same
-number of active parameters.
+El curso construye dos modelos de lenguaje. El primero es GPT-2, la
+arquitectura densa de 2019. El segundo reemplaza cada bloque feed-forward por
+una capa Mixture of Experts. Mixtral, DeepSeek y casi todos los modelos grandes
+de hoy usan esa arquitectura. Al final comparás los dos, con la misma cantidad
+de parámetros activos.
 
-Nothing here is a black box. You write the tokenizer, the attention, the
-transformer block, the training loop, the router, and the load-balance loss.
+Acá no hay ninguna caja negra. Vos escribís el tokenizador, el attention, el
+bloque del transformer, el loop de entrenamiento, el router y el loss de
+balanceo de carga.
 
-## How the course works
+## Cómo funciona el curso
 
-Each chapter is one directory in `chapters/`, with four files:
+Cada capítulo es un directorio dentro de `chapters/`, con cuatro archivos:
 
-| File | What it is |
+| Archivo | Qué es |
 |---|---|
-| `README.md` | The theory, and the description of your task |
-| `exercise.py` | Your code. Each function starts with `raise NotImplementedError` |
-| `test_exercise.py` | The tests. Green means that your code is correct |
-| `solution.py` | The reference code, for the moment when you are blocked |
+| `README.md` | La teoría y la descripción de tu tarea |
+| `exercise.py` | Tu código. Cada función arranca con `raise NotImplementedError` |
+| `test_exercise.py` | Los tests. Verde quiere decir que tu código está bien |
+| `solution.py` | El código de referencia, para el momento en que te trabás |
 
-You build the package `gpt2moe/` yourself. It is almost empty now. After the
-tests of a chapter pass, promote your code:
+El paquete `gpt2moe/` lo construís vos. Ahora está casi vacío. Cuando pasan los
+tests de un capítulo, promové tu código:
 
 ```bash
 uv run python scripts/promote.py ch00
 ```
 
-The command copies your `exercise.py` into `gpt2moe/`, but only if the tests
-pass. The next chapter imports from the package, so it imports your own code.
-By Chapter 8 you train a model that is your work from the tokenizer to the
-optimizer.
+El comando copia tu `exercise.py` dentro de `gpt2moe/`, pero solo si los tests
+pasan. El capítulo siguiente importa desde el paquete, así que importa tu
+propio código. Para el capítulo 8 entrenás un modelo que es obra tuya, desde el
+tokenizador hasta el optimizador.
 
-## The website
+## El sitio
 
 <https://gpt2-moe-from-scratch.vercel.app>
 
-The site shows the theory of each chapter and the state of the course. It
-reads the README of each chapter, so the text has one home only.
+El sitio muestra la teoría de cada capítulo y el estado del curso. Lee el
+README de cada capítulo, así que el texto vive en un solo lugar.
 
-The progress is a measurement, not a declaration:
+El progreso es una medición, no una declaración:
 
-1. You make the tests of a chapter pass.
-2. You push.
-3. A GitHub Action runs pytest for every chapter, and writes the result of
-   each test to `progress.json`.
-4. Vercel builds the site again from that file.
+1. Hacés pasar los tests de un capítulo.
+2. Hacés push.
+3. Una GitHub Action corre pytest para cada capítulo y escribe el resultado de
+   cada test en `progress.json`.
+4. Vercel vuelve a construir el sitio a partir de ese archivo.
 
-The site holds no state of its own, so it cannot show a green chapter while
-the tests fail. To see the numbers before a push, run the measurement:
+El sitio no guarda estado propio, así que no puede mostrar un capítulo en verde
+mientras los tests fallan. Para ver los números antes de un push, corré la
+medición:
 
 ```bash
 uv run python scripts/sync_progress.py
 ```
 
-## Install
+## Instalación
 
-1. Install `uv`, if the computer does not have it.
-2. Run `uv sync`. The command creates the environment and installs PyTorch.
-3. Run `uv run python scripts/get_data.py` to get the corpus.
-4. Run the first tests. They fail, and that is the correct start.
+1. Instalá `uv`, si la computadora no lo tiene.
+2. Corré `uv sync`. El comando crea el entorno e instala PyTorch.
+3. Corré `uv run python scripts/get_data.py` para bajar el corpus.
+4. Corré los primeros tests. Fallan, y ese es el arranque correcto.
 
 ```bash
 uv run pytest chapters/ch00_tensors
 ```
 
-## Commands
+## Comandos
 
-| Command | What it does |
+| Comando | Qué hace |
 |---|---|
-| `uv run pytest chapters/ch00_tensors` | Test one chapter |
-| `uv run pytest` | Test every chapter |
-| `uv run pytest -m "not slow"` | Skip the tests that need a download |
-| `MOE_TARGET=solution uv run pytest` | Test the reference code, not yours |
-| `uv run python scripts/promote.py ch00` | Move your validated code into `gpt2moe/` |
-| `uv run python scripts/promote.py ch00 --from-solution` | Move the reference code, to continue |
+| `uv run pytest chapters/ch00_tensors` | Testea un capítulo |
+| `uv run pytest` | Testea todos los capítulos |
+| `uv run pytest -m "not slow"` | Saltea los tests que necesitan una descarga |
+| `MOE_TARGET=solution uv run pytest` | Testea el código de referencia, no el tuyo |
+| `uv run python scripts/promote.py ch00` | Mueve tu código validado a `gpt2moe/` |
+| `uv run python scripts/promote.py ch00 --from-solution` | Mueve el código de referencia, para seguir |
 
-## The chapters
+## Los capítulos
 
-### Part 1 — The base
+### Parte 1: la base
 
-| Chapter | Subject | What you write |
+| Capítulo | Tema | Qué escribís |
 |---|---|---|
-| `ch00_tensors` | Tensors, softmax, gradients | A stable softmax, cross entropy, a backward pass by hand |
-| `ch01_data` | The data pipeline | A character tokenizer, the split, the batch sampler |
-| `ch02_bpe` | Byte Pair Encoding | The BPE algorithm, and a comparison against `tiktoken` |
+| `ch00_tensors` | Tensores, softmax, gradientes | Un softmax estable, cross entropy, un backward hecho a mano |
+| `ch01_data` | El pipeline de datos | Un tokenizador de caracteres, el split, el sampler de batches |
+| `ch02_bpe` | Byte Pair Encoding | El algoritmo de BPE, y una comparación contra `tiktoken` |
 
-### Part 2 — The transformer
+### Parte 2: el transformer
 
-| Chapter | Subject | What you write |
+| Capítulo | Tema | Qué escribís |
 |---|---|---|
-| `ch03_embeddings` | Embeddings and a baseline | A bigram model, and the first sanity check at `log(V)` |
-| `ch04_attention` | Self-attention | One head, the causal mask, the scale of `1/sqrt(d)` |
-| `ch05_multihead` | Multi-head attention | The version with a loop, and the vectorized version |
-| `ch06_block` | The transformer block | The feed-forward layer, GELU, pre-LN, the residual path |
-| `ch07_gpt2` | The complete model | GPT-2, with weight tying and the original initialization |
-| `ch08_training` | The training loop | AdamW, warmup, cosine schedule, sampling |
+| `ch03_embeddings` | Embeddings y un baseline | Un modelo de bigramas, y el primer chequeo de cordura en `log(V)` |
+| `ch04_attention` | Self-attention | Una cabeza, la máscara causal, la escala de `1/sqrt(d)` |
+| `ch05_multihead` | Multi-head attention | La versión con loop, y la versión vectorizada |
+| `ch06_block` | El bloque del transformer | La capa feed-forward, GELU, pre-LN, el camino residual |
+| `ch07_gpt2` | El modelo completo | GPT-2, con weight tying y la inicialización original |
+| `ch08_training` | El loop de entrenamiento | AdamW, warmup, cosine schedule, muestreo |
 
-### Part 3 — Mixture of Experts
+### Parte 3: Mixture of Experts
 
-| Chapter | Subject | What you write |
+| Capítulo | Tema | Qué escribís |
 |---|---|---|
-| `ch09_moe` | The first MoE layer | The router, top-k selection, the weighted combination |
-| `ch10_balance` | The collapse problem | Expert use metrics, the auxiliary loss, the router z-loss |
-| `ch11_capacity` | Capacity and dispatch | The capacity factor, token drop, a vectorized dispatch |
-| `ch12_compare` | Dense against sparse | The experiment, and the comparison at equal active parameters |
-| `ch13_ablations` | Ablations | Top-1 against top-2, the number of experts, no auxiliary loss |
+| `ch09_moe` | La primera capa MoE | El router, la selección top-k, la combinación ponderada |
+| `ch10_balance` | El problema del colapso | Métricas de uso de los expertos, el loss auxiliar, el z-loss del router |
+| `ch11_capacity` | Capacidad y dispatch | El factor de capacidad, el descarte de tokens, un dispatch vectorizado |
+| `ch12_compare` | Denso contra sparse | El experimento, y la comparación con la misma cantidad de parámetros activos |
+| `ch13_ablations` | Ablaciones | Top-1 contra top-2, la cantidad de expertos, sin loss auxiliar |
 
-## How you know that the model is correct
+## Cómo sabés que el modelo está bien
 
-Each part ends with a test that is difficult to pass by accident.
+Cada parte termina con un test difícil de pasar por casualidad.
 
-| Chapter | Green means |
+| Capítulo | Verde quiere decir |
 |---|---|
-| `ch05` | The vectorized attention agrees with the version that uses a loop |
-| `ch07` | Your GPT-2, with the real weights of `gpt2`, gives the same logits as the reference (atol 1e-4). This proves that your model **is** GPT-2 |
-| `ch08` | The dense model goes under the validation loss target |
-| `ch11` | The vectorized MoE agrees with the naive MoE |
-| `ch12` | The MoE model beats the dense model at equal active parameters |
+| `ch05` | El attention vectorizado coincide con la versión que usa un loop |
+| `ch07` | Tu GPT-2, con los pesos reales de `gpt2`, da los mismos logits que la referencia (atol 1e-4). Esto prueba que tu modelo **es** GPT-2 |
+| `ch08` | El modelo denso baja del loss de validación objetivo |
+| `ch11` | El MoE vectorizado coincide con el MoE naive |
+| `ch12` | El modelo MoE le gana al modelo denso con la misma cantidad de parámetros activos |
 
 ## Hardware
 
-The models are small on purpose: 6 layers, 6 heads, 384 dimensions, a context
-of 256 tokens, and about 10 million parameters. A training run takes minutes
-on the GPU of an Apple Silicon machine, through the MPS backend of PyTorch. A
-CPU also works, with more patience.
+Los modelos son chicos a propósito: 6 capas, 6 cabezas, 384 dimensiones, un
+contexto de 256 tokens y alrededor de 10 millones de parámetros. Una corrida de
+entrenamiento tarda minutos en la GPU de una máquina Apple Silicon, con el
+backend MPS de PyTorch. En CPU también anda, con más paciencia.
 
-One test in Chapter 7 downloads about 500 MB of weights from Hugging Face. It
-carries the mark `slow`, so the rest of the course works without a network.
+Un test del capítulo 7 baja unos 500 MB de pesos desde Hugging Face. Lleva la
+marca `slow`, así que el resto del curso funciona sin red.
 
-## Credits
+## Créditos
 
-The path from the bigram model to GPT-2 follows the structure of *Let's build
-GPT* and `nanoGPT`, by Andrej Karpathy. The BPE chapter follows `minbpe`, from
-the same author. The Mixture of Experts part uses three papers:
+El camino desde el modelo de bigramas hasta GPT-2 sigue la estructura de *Let's
+build GPT* y `nanoGPT`, de Andrej Karpathy. El capítulo de BPE sigue `minbpe`,
+del mismo autor. La parte de Mixture of Experts usa tres papers:
 
 - Switch Transformer, Fedus et al., 2021
 - ST-MoE, Zoph et al., 2022

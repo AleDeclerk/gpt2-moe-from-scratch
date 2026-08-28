@@ -1,6 +1,6 @@
-"""Chapter 1 — the data pipeline.
+"""Capítulo 1: el pipeline de datos.
 
-Write the class and the two functions. Read README.md first.
+Escribí la clase y las dos funciones. Leé primero README.md.
 """
 
 from __future__ import annotations
@@ -9,37 +9,37 @@ import torch
 
 
 class CharTokenizer:
-    """A tokenizer with one integer for each different character.
+    """Un tokenizador que le da un entero a cada carácter distinto.
 
-    Attributes:
-        chars: the sorted list of the characters in the vocabulary.
-        stoi: a dict that maps a character to its integer.
-        itos: a dict that maps an integer to its character.
+    Atributos:
+        chars: la lista ordenada de los caracteres del vocabulario.
+        stoi: un dict que lleva de un carácter a su entero.
+        itos: un dict que lleva de un entero a su carácter.
     """
 
     def __init__(self, chars: list[str]) -> None:
-        """Build the two maps from a sorted list of characters."""
+        """Armá los dos mapas a partir de una lista ordenada de caracteres."""
         raise NotImplementedError("CharTokenizer.__init__")
 
     @classmethod
     def from_text(cls, text: str) -> "CharTokenizer":
-        """Build a tokenizer from the characters that are present in `text`.
+        """Armá un tokenizador con los caracteres que aparecen en `text`.
 
-        The order must be stable between runs, so sort the characters.
+        El orden tiene que ser estable entre corridas: ordená los caracteres.
         """
         raise NotImplementedError("CharTokenizer.from_text")
 
     @property
     def vocab_size(self) -> int:
-        """Get the number of different tokens."""
+        """Devolvé la cantidad de tokens distintos."""
         raise NotImplementedError("CharTokenizer.vocab_size")
 
     def encode(self, text: str) -> list[int]:
-        """Map a string to a list of integers."""
+        """Convertí un string en una lista de enteros."""
         raise NotImplementedError("CharTokenizer.encode")
 
     def decode(self, ids: list[int]) -> str:
-        """Map a list of integers back to a string."""
+        """Convertí una lista de enteros de vuelta a un string."""
         raise NotImplementedError("CharTokenizer.decode")
 
 
@@ -47,19 +47,20 @@ def train_val_split(
     data: torch.Tensor,
     val_fraction: float = 0.1,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Cut the sequence into a training part and a validation part.
+    """Cortá la secuencia en una parte de entrenamiento y una de validación.
 
-    Args:
-        data: a 1-D tensor of token identifiers.
-        val_fraction: the part of the data for validation, between 0 and 1.
+    Argumentos:
+        data: un tensor 1-D de identificadores de tokens.
+        val_fraction: la porción de los datos que va a validación, entre 0 y 1.
 
-    Returns:
-        A tuple (train, val). The two parts are contiguous, and `val` is the
-        end of the sequence. Together they hold every element of `data`.
+    Devuelve:
+        Una tupla (train, val). Las dos partes son contiguas, y `val` es el
+        final de la secuencia. Entre las dos tienen todos los elementos de
+        `data`.
 
-    Rules:
-        Do not shuffle. README.md explains why a random split gives a
-        validation loss that is too good.
+    Reglas:
+        No mezcles nada. El README.md explica por qué un split aleatorio da un
+        loss de validación demasiado bueno.
     """
     raise NotImplementedError("train_val_split")
 
@@ -70,21 +71,21 @@ def get_batch(
     block_size: int,
     generator: torch.Generator | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Take a batch of random blocks, and the same blocks moved one position.
+    """Tomá un batch de bloques al azar, y los mismos corridos una posición.
 
-    Args:
-        data: a 1-D tensor of token identifiers.
-        batch_size: the number of blocks, B.
-        block_size: the number of tokens in each block, T.
-        generator: a torch.Generator for the random offsets, or None.
+    Argumentos:
+        data: un tensor 1-D de identificadores de tokens.
+        batch_size: la cantidad de bloques, B.
+        block_size: la cantidad de tokens de cada bloque, T.
+        generator: un torch.Generator para los offsets al azar, o None.
 
-    Returns:
-        A tuple (x, y). Both tensors have shape (B, T) and dtype int64.
-        y[b, t] is the token that comes after x[b, t].
+    Devuelve:
+        Una tupla (x, y). Los dos tensores tienen shape (B, T) y dtype int64.
+        y[b, t] es el token que viene justo después de x[b, t].
 
-    Rules:
-        Use torch.randint with the `generator` argument, so a fixed seed gives
-        the same batch every time.
-        Watch the largest valid offset. y reads one position beyond x.
+    Reglas:
+        Usá torch.randint con el argumento `generator`, así una seed fija te da
+        siempre el mismo batch.
+        Ojo con el offset válido más grande: y lee una posición más allá de x.
     """
     raise NotImplementedError("get_batch")

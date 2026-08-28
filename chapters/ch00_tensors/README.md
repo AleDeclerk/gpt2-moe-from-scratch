@@ -1,123 +1,127 @@
-# Chapter 0 — Tensors, softmax, and gradients
+# Capítulo 0: tensores, softmax y gradientes
 
-## Why this chapter is first
+## Por qué este capítulo va primero
 
-Three operations appear in every later chapter. A softmax over the last
-dimension turns attention scores into weights, and it also turns the final
-logits into a probability for each token. A cross-entropy loss measures how
-wrong those probabilities are. The chain rule moves that error back to every
-parameter.
+Hay tres operaciones que aparecen en todos los capítulos que siguen. Un
+softmax sobre la última dimensión convierte los scores de attention en pesos,
+y también convierte los logits finales en una probabilidad para cada token. Un
+loss de cross entropy mide qué tan equivocadas están esas probabilidades. La
+regla de la cadena lleva ese error de vuelta hasta cada parámetro.
 
-PyTorch has all three, and this course uses the PyTorch version after this
-chapter. You write them one time here, because a bug in a later chapter is
-easier to find when you know what these operations do.
+PyTorch tiene las tres, y de acá en adelante el curso usa la versión de
+PyTorch. Las escribís una sola vez, acá, porque un bug en un capítulo
+posterior se encuentra mucho más rápido cuando ya sabés qué hace cada una de
+estas operaciones.
 
-## 1. A stable softmax
+## 1. Un softmax estable
 
-The definition is simple. For one row of numbers `z`:
+La definición es simple. Para una fila de números `z`:
 
 ```
 softmax(z)_i = exp(z_i) / sum_j exp(z_j)
 ```
 
-The direct translation of that formula into code fails. With `z_i = 1000`,
-`exp(1000)` is larger than the largest float, so the result is `inf`. Then
-`inf / inf` gives `nan`, and the `nan` moves through the whole model.
+Pasar esa fórmula directo a código falla. Con `z_i = 1000`, `exp(1000)` es más
+grande que el float más grande que existe, así que el resultado es `inf`.
+Después `inf / inf` da `nan`, y ese `nan` se propaga por todo el modelo.
 
-The correction uses a property of the softmax. Subtract any constant `c` from
-every element of `z`, and the result does not change:
+La corrección usa una propiedad del softmax: si le restás una constante `c` a
+cada elemento de `z`, el resultado no cambia:
 
 ```
 exp(z_i - c) / sum_j exp(z_j - c) = [exp(z_i) exp(-c)] / [exp(-c) sum_j exp(z_j)]
 ```
 
-The factor `exp(-c)` is present in the numerator and in the denominator, so it
-cancels. The useful choice is `c = max(z)`. After the subtraction the largest
-element is `0`, so `exp` returns a number between `0` and `1`. No overflow is
-possible.
+El factor `exp(-c)` está en el numerador y en el denominador, así que se
+cancela. La elección útil es `c = max(z)`. Después de la resta el elemento más
+grande queda en `0`, así que `exp` devuelve un número entre `0` y `1`. No hay
+overflow posible.
 
-This is not a detail of style. GPT-2 divides attention scores by the square
-root of the head dimension for a related reason, and Chapter 4 explains that
-one.
+Esto no es un detalle de estilo. GPT-2 divide los scores de attention por la
+raíz cuadrada de la dimensión de la cabeza por una razón parecida, y el
+capítulo 4 la explica.
 
-**Shapes.** Your function receives a 2-D tensor with shape `(N, C)` and
-returns a tensor with the same shape. Each row must have a sum of `1`. Watch
-the `keepdim` argument of `max` and `sum`, because a reduction without
-`keepdim` removes the dimension and breaks the broadcast.
+**Shapes.** Tu función recibe un tensor 2-D con shape `(N, C)` y devuelve un
+tensor con el mismo shape. Cada fila tiene que sumar `1`. Mirá bien el
+argumento `keepdim` de `max` y de `sum`: una reducción sin `keepdim` saca la
+dimensión y rompe el broadcast.
 
 ## 2. Cross entropy
 
-The model gives a score, called a logit, to each of the `C` tokens in the
-vocabulary. The correct next token has index `t`. The loss is the negative
-logarithm of the probability that the model gives to `t`:
+El modelo le da un score, que se llama logit, a cada uno de los `C` tokens del
+vocabulario. El token correcto que sigue tiene índice `t`. El loss es el
+logaritmo negativo de la probabilidad que el modelo le da a `t`:
 
 ```
 loss = -log(softmax(z)_t)
 ```
 
-A perfect model gives probability `1` to the correct token, and `-log(1)` is
-`0`. A model that gives probability `0.001` receives a loss of about `6.9`.
+Un modelo perfecto le da probabilidad `1` al token correcto, y `-log(1)` es
+`0`. Un modelo que le da probabilidad `0.001` se lleva un loss de más o menos
+`6.9`.
 
-There is a trap here as well. The expression `log(softmax(z))` calculates the
-exponential and then the logarithm, and the two operations lose precision. The
-algebra removes the round trip:
+Acá también hay una trampa. La expresión `log(softmax(z))` calcula la
+exponencial y después el logaritmo, y esas dos operaciones juntas pierden
+precisión. El álgebra te saca ese ida y vuelta de encima:
 
 ```
 log_softmax(z)_i = z_i - max(z) - log(sum_j exp(z_j - max(z)))
 ```
 
-Your function takes logits with shape `(N, C)` and targets with shape `(N,)`,
-and returns one scalar: the mean loss over the `N` rows.
+Tu función toma logits con shape `(N, C)` y targets con shape `(N,)`, y
+devuelve un solo escalar: el loss promedio sobre las `N` filas.
 
-**A number to remember.** An untrained model gives about the same probability
-to every token, so the loss is about `log(C)`. With a vocabulary of 65
-characters that value is about `4.17`. Chapter 3 uses this number as the first
-test of the first model. A training run that starts far above `log(C)` has a
-bug in the initialization.
+**Un número para acordarse.** Un modelo sin entrenar le da más o menos la
+misma probabilidad a cada token, así que el loss ronda `log(C)`. Con un
+vocabulario de 65 caracteres ese valor da cerca de `4.17`. El capítulo 3 usa
+este número como primer test del primer modelo. Un entrenamiento que arranca
+muy por encima de `log(C)` tiene un bug en la inicialización.
 
-## 3. The backward pass of a linear layer
+## 3. El backward de una capa lineal
 
-A linear layer is `y = x @ W + b`. During training, PyTorch gives you the
-gradient of the loss for the output, `dL/dy`. You need three more gradients.
+Una capa lineal es `y = x @ W + b`. Durante el entrenamiento, PyTorch te da el
+gradiente del loss respecto de la salida, `dL/dy`. Te faltan tres gradientes
+más.
 
-The rule for a matrix product is short:
+La regla para un producto de matrices es corta:
 
 ```
 dL/dx = dL/dy @ W.T
 dL/dW = x.T @ dL/dy
-dL/db = dL/dy summed over the batch dimension
+dL/db = dL/dy sumado sobre la dimensión del batch
 ```
 
-Shape analysis is enough to remember these. With `x` of shape `(N, in)`, `W`
-of shape `(in, out)`, and `dL/dy` of shape `(N, out)`, only one arrangement of
-each product gives the correct shape. The bias gradient is a sum. The same
-`b` is added to all `N` rows, so all `N` rows send an error to it.
+Con mirar los shapes alcanza para acordarse. Con `x` de shape `(N, in)`, `W`
+de shape `(in, out)` y `dL/dy` de shape `(N, out)`, hay un solo orden de cada
+producto que da el shape correcto. El gradiente del bias es una suma: el mismo
+`b` se suma a las `N` filas, así que las `N` filas le mandan error.
 
-Your function returns the three gradients as a tuple. The test compares them
-against `loss.backward()` from PyTorch. Equal numbers mean that your
-derivation is correct.
+Tu función devuelve los tres gradientes como una tupla. El test los compara
+contra `loss.backward()` de PyTorch. Si los números dan iguales, tu derivación
+está bien.
 
-## Your task
+## Tu tarea
 
-1. Open `exercise.py`.
-2. Write the three functions. Do not use `torch.softmax`, `torch.log_softmax`,
-   `torch.nn.functional.cross_entropy`, or `backward`.
-3. Run the tests.
+1. Abrí `exercise.py`.
+2. Escribí las tres funciones. No uses `torch.softmax`, `torch.log_softmax`,
+   `torch.nn.functional.cross_entropy` ni `backward`.
+3. Corré los tests.
 
 ```bash
 uv run pytest chapters/ch00_tensors
 ```
 
-4. After the tests pass, promote the code.
+4. Cuando los tests pasen, promové el código.
 
 ```bash
 uv run python scripts/promote.py ch00
 ```
 
-## Questions to answer for yourself
+## Preguntas para responderte a vos mismo
 
-- The test `test_softmax_is_stable` uses logits of `1000`. Remove the
-  subtraction of the maximum and run it. What is the output?
-- Why does `dL/db` need a sum, but `dL/dW` needs a matrix product?
-- The mean loss divides by `N`. Which gradient changes if the loss uses a sum
-  instead, and by how much?
+- El test `test_softmax_is_stable` usa logits de `1000`. Sacá la resta del
+  máximo y correlo. ¿Qué te da?
+- ¿Por qué `dL/db` necesita una suma y `dL/dW` necesita un producto de
+  matrices?
+- El loss promedio divide por `N`. ¿Qué gradiente cambia si el loss usa una
+  suma en vez del promedio, y en cuánto?

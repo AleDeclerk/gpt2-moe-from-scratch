@@ -1,7 +1,7 @@
-name: Measure progress
+name: Medir el progreso
 
-# The website shows the number of tests that pass. This workflow makes that
-# number true after every push, without a manual step.
+# El sitio muestra la cantidad de tests que pasan. Este workflow hace que ese
+# número sea cierto después de cada push, sin ningún paso manual.
 on:
   push:
     branches: [main]
@@ -28,25 +28,25 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Install the test environment
+      - name: Instalar el entorno de tests
         run: |
           uv venv --python 3.13
-          # The CPU build of PyTorch is much smaller than the default one, and
-          # the tests of this course do not need a GPU.
+          # El build de CPU de PyTorch es mucho más chico que el que viene por
+          # defecto, y los tests de este curso no necesitan GPU.
           uv pip install torch --index-url https://download.pytorch.org/whl/cpu
           uv pip install pytest numpy tiktoken
 
-      - name: Measure the progress
+      - name: Medir el progreso
         run: uv run python scripts/sync_progress.py
 
-      - name: Commit the result, if it changed
+      - name: Commitear el resultado, si cambió
         run: |
           if git diff --quiet progress.json; then
-            echo "No change in progress.json."
+            echo "Sin cambios en progress.json."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add progress.json
-          git commit -m "Update the measured progress [skip ci]"
+          git commit -m "Actualiza el progreso medido [skip ci]"
           git push

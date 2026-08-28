@@ -1,10 +1,10 @@
 import type { Chapter, ChapterStatus } from "@/lib/course";
 
 const LABEL: Record<ChapterStatus, string> = {
-  planned: "planned",
-  todo: "not started",
-  in_progress: "in progress",
-  done: "done",
+  planned: "planeado",
+  todo: "sin empezar",
+  in_progress: "en progreso",
+  done: "listo",
 };
 
 const TONE: Record<ChapterStatus, string> = {
@@ -24,10 +24,10 @@ export function StatusChip({ status }: { status: ChapterStatus }) {
   );
 }
 
-/** One mark for each test of the chapter. The bar is the chapter, in detail. */
+/** Una marca por cada test del capítulo. La barra es el capítulo, en detalle. */
 export function TestBar({ chapter }: { chapter: Chapter }) {
   if (!chapter.exists) {
-    return <span className="text-[11px] text-faint">not written yet</span>;
+    return <span className="text-[11px] text-faint">todavía sin escribir</span>;
   }
   return (
     <div className="flex items-center gap-2.5">
@@ -35,7 +35,7 @@ export function TestBar({ chapter }: { chapter: Chapter }) {
         {chapter.tests.map((test) => (
           <span
             key={test.name}
-            title={`${test.name} — ${test.passed ? "passes" : "fails"}`}
+            title={`${test.name}: ${test.passed ? "pasa" : "falla"}`}
             className={`h-3 w-[5px] rounded-[1px] ${test.passed ? "bg-done" : "bg-rule"}`}
           />
         ))}

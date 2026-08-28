@@ -1,17 +1,17 @@
 # web
 
-The website of the course. It renders the chapters and the measured progress.
+El sitio del curso. Renderiza los capítulos y el progreso medido.
 
-The application reads three things from the repository, one level up:
+La aplicación lee tres cosas del repositorio, un nivel más arriba:
 
-| Source | Use |
+| Fuente | Para qué sirve |
 |---|---|
-| `chapters/manifest.json` | The list of the 14 chapters, and the order |
-| `chapters/*/README.md` | The theory of each chapter |
-| `progress.json` | The result of each test, from `scripts/sync_progress.py` |
+| `chapters/manifest.json` | La lista de los 14 capítulos, y el orden |
+| `chapters/*/README.md` | La teoría de cada capítulo |
+| `progress.json` | El resultado de cada test, que sale de `scripts/sync_progress.py` |
 
-The theory has one home only, which is the README of the chapter. The site
-does not hold a copy.
+La teoría vive en un solo lugar: el README del capítulo. El sitio no guarda
+una copia.
 
 ## Local
 
@@ -20,10 +20,10 @@ npm install
 npm run dev
 ```
 
-The build is static. To see a change of the progress, run
-`uv run python scripts/sync_progress.py` in the root of the repository first.
+El build es estático. Si querés ver un cambio del progreso, corré primero
+`uv run python scripts/sync_progress.py` en la raíz del repositorio.
 
 ## Deploy
 
-Vercel builds this directory from the root of the repository, with the
-commands in `vercel.json`. A push to `main` starts a deployment.
+Vercel construye este directorio desde la raíz del repositorio, con los
+comandos de `vercel.json`. Un push a `main` dispara un deployment.

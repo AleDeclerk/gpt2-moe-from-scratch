@@ -22,19 +22,19 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "GPT-2 with Mixture of Experts, from scratch",
+  title: "GPT-2 con Mixture of Experts, desde cero",
   description:
-    "A course in the form of a repository. You write the code, the tests give the pass condition, and this site reads the result.",
+    "Un curso con forma de repositorio. Vos escribís el código, los tests marcan cuándo está bien, y este sitio lee el resultado.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const { totals, repo } = getProgress();
 
   return (
-    // The font variables must sit on <html>. The theme in globals.css defines
-    // --font-display in :root, and it reads these. A definition on <body>
-    // would be invisible from :root, and every font would fall back.
-    <html lang="en" className={`${plexMono.variable} ${instrument.variable} ${sourceSerif.variable}`}>
+    // Las variables de fuente van en <html>. El theme de globals.css define
+    // --font-display en :root, y desde ahí las lee. Si las definís en <body>,
+    // :root no las ve y todas las fuentes caen al fallback.
+    <html lang="es" className={`${plexMono.variable} ${instrument.variable} ${sourceSerif.variable}`}>
       <body>
         <header className="sticky top-0 z-50 border-b border-rule bg-paper/85 backdrop-blur-sm">
           <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-4 px-6 py-3 text-[11px] tracking-[0.14em] uppercase">
@@ -56,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
         {children}
         <footer className="mx-auto max-w-[1120px] px-6 py-14 text-[11px] tracking-[0.12em] text-faint uppercase">
-          Every number on this site comes from a pytest run in the repository.
+          Todos los números de este sitio salen de una corrida de pytest en el repositorio.
         </footer>
       </body>
     </html>

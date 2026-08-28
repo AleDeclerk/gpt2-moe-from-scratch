@@ -12,46 +12,46 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-[1120px] px-6">
-      {/* ---- hero ---- */}
+      {/* ---- el encabezado ---- */}
       <section className="grid gap-12 border-b border-rule py-20 md:grid-cols-[1.45fr_1fr] md:gap-16 md:py-28">
         <div>
           <p className="rise mb-6 text-[11px] tracking-[0.2em] text-accent uppercase">
-            A course you run, not a course you watch
+            Un curso que corrés, no un curso que mirás
           </p>
           <h1
             className="rise font-display text-[clamp(2.7rem,7vw,4.6rem)] leading-[0.95] tracking-[-0.01em]"
             style={{ "--i": 1 } as React.CSSProperties}
           >
-            GPT&#8209;2 with a<br />
+            GPT&#8209;2 con<br />
             Mixture of&nbsp;Experts,
             <br />
-            <span className="text-faint italic">from scratch.</span>
+            <span className="text-faint italic">desde cero.</span>
           </h1>
           <p
             className="rise mt-8 max-w-[52ch] font-prose text-[17px] leading-[1.7] text-dim"
             style={{ "--i": 2 } as React.CSSProperties}
           >
-            Fourteen chapters that build a language model twice. First the dense
-            GPT&#8209;2 of 2019. Then the sparse variant behind Mixtral and
-            DeepSeek. Every function is written by hand, and pytest gives the
-            pass condition.
+            Catorce capítulos que construyen un modelo de lenguaje dos veces.
+            Primero el GPT&#8209;2 denso de 2019. Después la variante sparse
+            que hay detrás de Mixtral y DeepSeek. Escribís cada función a mano,
+            y pytest define la condición para pasar.
           </p>
         </div>
 
-        {/* ---- the instrument ---- */}
+        {/* ---- el instrumento ---- */}
         <aside
           className="rise self-end border border-rule bg-raised/60 p-6"
           style={{ "--i": 3 } as React.CSSProperties}
         >
           <p className="text-[10px] tracking-[0.18em] text-faint uppercase">
-            Progress, measured
+            El progreso, medido
           </p>
           <p className="mt-5 font-display text-6xl leading-none tabular-nums">
             {totals.tests_passed}
             <span className="text-2xl text-faint">/{totals.tests_total}</span>
           </p>
           <p className="mt-2 text-[11px] tracking-[0.12em] text-faint uppercase">
-            tests green
+            tests en verde
           </p>
 
           <div className="mt-6 h-[3px] w-full bg-rule">
@@ -63,42 +63,42 @@ export default function Home() {
 
           <dl className="mt-6 space-y-2 text-[11px] tracking-[0.1em] uppercase">
             <div className="flex justify-between">
-              <dt className="text-faint">chapters done</dt>
+              <dt className="text-faint">capítulos hechos</dt>
               <dd className="tabular-nums text-dim">
                 {totals.chapters_done}/{totals.chapters_total}
               </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-faint">chapters written</dt>
+              <dt className="text-faint">capítulos escritos</dt>
               <dd className="tabular-nums text-dim">
                 {totals.chapters_written}/{totals.chapters_total}
               </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-faint">measured</dt>
+              <dt className="text-faint">medido</dt>
               <dd className="text-dim">{generated_at.slice(0, 10)}</dd>
             </div>
           </dl>
         </aside>
       </section>
 
-      {/* ---- how it works ---- */}
+      {/* ---- cómo funciona ---- */}
       <section className="grid gap-8 border-b border-rule py-14 sm:grid-cols-3">
         {[
           {
             n: "01",
-            head: "Read, then write",
-            body: "Each chapter explains the theory, then hands you a file of empty functions.",
+            head: "Leé, después escribí",
+            body: "Cada capítulo explica la teoría y después te da un archivo con las funciones vacías.",
           },
           {
             n: "02",
-            head: "The tests decide",
-            body: "Green is not an opinion. Run pytest, and the chapter tells you what is still wrong.",
+            head: "Deciden los tests",
+            body: "El verde no es una opinión. Corrés pytest y el capítulo te dice qué sigue mal.",
           },
           {
             n: "03",
-            head: "Promote your code",
-            body: "Validated code moves into the package, and the next chapter imports it. You build the library.",
+            head: "Promové tu código",
+            body: "El código validado pasa al paquete y el capítulo siguiente lo importa. La biblioteca la construís vos.",
           },
         ].map((step, i) => (
           <div key={step.n} className="rise" style={{ "--i": i } as React.CSSProperties}>
@@ -111,7 +111,7 @@ export default function Home() {
         ))}
       </section>
 
-      {/* ---- the chapters ---- */}
+      {/* ---- los capítulos ---- */}
       {parts.map((part, partIndex) => (
         <section key={part.title} className="border-b border-rule py-14">
           <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:gap-6">
@@ -175,7 +175,7 @@ export default function Home() {
           href={repo}
           className="inline-block border border-rule px-5 py-3 text-[11px] tracking-[0.16em] uppercase transition-colors hover:border-accent hover:text-accent"
         >
-          Clone the repository &#8599;
+          Cloná el repositorio &#8599;
         </a>
       </section>
     </main>

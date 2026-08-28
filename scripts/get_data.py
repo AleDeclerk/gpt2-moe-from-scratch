@@ -1,7 +1,7 @@
-"""Download the Tiny Shakespeare dataset into `data/`.
+"""Baja el dataset Tiny Shakespeare a `data/`.
 
-The file has about 1.1 MB of text, and it is the training corpus for the whole
-course. Chapter 1 explains what the course does with it.
+El archivo tiene alrededor de 1.1 MB de texto, y es el corpus de entrenamiento
+de todo el curso. El capítulo 1 explica qué hace el curso con él.
 
     uv run python scripts/get_data.py
 """
@@ -20,19 +20,19 @@ DESTINATION = Path(__file__).resolve().parent.parent / "data" / "tinyshakespeare
 def main() -> None:
     if DESTINATION.exists():
         size = DESTINATION.stat().st_size
-        print(f"{DESTINATION} exists already, with {size} bytes. Nothing to do.")
+        print(f"{DESTINATION} ya existe, con {size} bytes. No hay nada que hacer.")
         return
 
     DESTINATION.parent.mkdir(parents=True, exist_ok=True)
-    print(f"Download {URL} ...")
+    print(f"Bajando {URL} ...")
     try:
         with urllib.request.urlopen(URL, timeout=30) as response:
             text = response.read().decode("utf-8")
-    except Exception as error:  # noqa: BLE001 - the message must stay readable
-        sys.exit(f"The download failed: {error}")
+    except Exception as error:  # noqa: BLE001 - el mensaje tiene que quedar legible
+        sys.exit(f"Falló la descarga: {error}")
 
     DESTINATION.write_text(text, encoding="utf-8")
-    print(f"OK. {len(text)} characters in {DESTINATION}")
+    print(f"OK. {len(text)} caracteres en {DESTINATION}")
 
 
 if __name__ == "__main__":

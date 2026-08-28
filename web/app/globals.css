@@ -16,7 +16,7 @@
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
-/* ---- ground ------------------------------------------------------------ */
+/* ---- la base ----------------------------------------------------------- */
 
 html {
   color-scheme: dark;
@@ -31,7 +31,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* A faint drafting grid. It gives the page a surface without a picture. */
+/* Una grilla de dibujo tenue. Le da una superficie a la página, sin una imagen. */
 body::before {
   content: "";
   position: fixed;
@@ -54,7 +54,7 @@ a {
   color: inherit;
 }
 
-/* ---- staggered reveal on load ------------------------------------------ */
+/* ---- aparición escalonada al cargar ------------------------------------ */
 
 @keyframes rise {
   from {
@@ -104,8 +104,8 @@ a {
   border-top: 1px solid var(--color-rule);
 }
 
-/* The page header already draws a rule, so the first section must not add
-   a second one with a gap between them. */
+/* El header de la página ya dibuja una línea, así que la primera sección no
+   tiene que agregar una segunda con un hueco en el medio. */
 .prose > h2:first-child {
   margin-top: 0;
   padding-top: 0;
@@ -178,7 +178,7 @@ a {
   margin-top: 0.4em;
 }
 
-/* Inline code, and the code blocks that shiki paints. */
+/* El código en línea, y los bloques de código que pinta shiki. */
 .prose :not(pre) > code {
   font-family: var(--font-mono);
   font-size: 0.84em;

@@ -1,72 +1,74 @@
-# Design — gpt2-moe-from-scratch
+# Diseño: gpt2-moe-from-scratch
 
-Date: 2026-08-28. Status: approved, in construction.
+Fecha: 2026-08-28. Estado: aprobado, en construcción.
 
-## Goal
+## Objetivo
 
-One repository that teaches GPT-2 and Mixture of Experts, with code that the
-reader writes. The reader is the owner of the repository, and the target is a
-solid understanding of every part, not a fast result.
+Un repositorio que enseña GPT-2 y Mixture of Experts, con código que escribe
+el lector. El lector es el dueño del repositorio, y lo que se busca es
+entender a fondo cada parte, no llegar rápido a un resultado.
 
-## Decisions
+## Decisiones
 
-| Decision | Choice | Reason |
+| Decisión | Qué se eligió | Por qué |
 |---|---|---|
-| Exercise format | Python modules with pytest | Green is not an opinion. A notebook has no clear pass condition, and git handles a `.py` file much better |
-| Start point | Everything from zero, tokenizer included | The request says "review the concepts". A given base removes exactly the review |
-| MoE depth | Top-k, load balance, capacity, diagnostics | A router alone collapses to one expert. The other parts are the answer to that problem |
-| Chapter coupling | Promotion | See below |
-| Language | English, ASD-STE100 rules | Global rule for everything that goes to GitHub |
+| Formato de los ejercicios | Módulos de Python con pytest | El verde no es una opinión. Un notebook no tiene una condición de pasar clara, y git maneja mucho mejor un archivo `.py` |
+| Punto de partida | Todo desde cero, tokenizador incluido | El pedido dice "repasar los conceptos". Una base ya escrita saca justo lo que hay que repasar |
+| Profundidad del MoE | Top-k, balanceo de carga, capacidad, diagnósticos | Un router solo colapsa en un único experto. Las otras partes son la respuesta a ese problema |
+| Acoplamiento entre capítulos | Promoción | Ver más abajo |
+| Idioma | Inglés, con las reglas de ASD-STE100 | Regla global para todo lo que va a GitHub |
 
-## The promotion model
+## El modelo de promoción
 
-Three models were possible for the relation between chapters:
+Para la relación entre capítulos había tres modelos posibles:
 
-1. **Self-contained.** Each chapter holds a copy of the code of the chapters
-   before it. No coupling, but the reader writes GPT-2 twelve times.
-2. **Shared package, given.** The package `gpt2moe/` arrives complete, and the
-   chapters import from it. No duplication, but the solution is visible from
-   day one.
-3. **Promotion (the choice).** The reader writes `exercise.py`. After the
-   tests pass, `scripts/promote.py` copies the file into `gpt2moe/`. The next
-   chapter imports from the package, so it imports the code of the reader.
+1. **Autocontenido.** Cada capítulo guarda una copia del código de los
+   capítulos anteriores. No hay acoplamiento, pero el lector escribe GPT-2
+   doce veces.
+2. **Paquete compartido, ya escrito.** El paquete `gpt2moe/` viene completo y
+   los capítulos importan de ahí. No hay duplicación, pero la solución se ve
+   desde el día uno.
+3. **Promoción (la elegida).** El lector escribe `exercise.py`. Cuando los
+   tests pasan, `scripts/promote.py` copia el archivo dentro de `gpt2moe/`. El
+   capítulo siguiente importa del paquete, así que importa el código del
+   propio lector.
 
-The third model has no duplication and no early solution, and the package
-gives a visible measure of progress. The cost is one command for each chapter.
+El tercer modelo no duplica nada ni adelanta la solución, y el paquete deja
+ver cómo avanza el progreso. El costo es un comando por capítulo.
 
-`--from-solution` promotes the reference code without a test run. This is the
-exit for a chapter that blocks the reader.
+`--from-solution` promueve el código de referencia sin correr los tests. Es la
+salida para un capítulo donde el lector se traba.
 
-## Test target selection
+## Cómo se elige el target de los tests
 
-The environment variable `MOE_TARGET` decides between `exercise` and
-`solution`. The fixture `target` in `conftest.py` loads the file by path, with
-a unique module name for each chapter. The unique name is necessary, because
-every chapter has a file with the same two names.
+La variable de entorno `MOE_TARGET` decide entre `exercise` y `solution`. El
+fixture `target` de `conftest.py` carga el archivo por ruta, con un nombre de
+módulo único para cada capítulo. El nombre único hace falta porque en todos
+los capítulos los archivos se llaman igual.
 
-This is the same pattern as `PREP_TARGET` in `python-intermediate-prep`.
+Es el mismo patrón que `PREP_TARGET` en `python-intermediate-prep`.
 
-## Model scale
+## Escala del modelo
 
-6 layers, 6 heads, 384 dimensions, a context of 256 tokens, about 10 million
-parameters. A training run takes minutes on MPS. The MoE variant of Chapter 12
-uses 8 experts with top-2. That gives about 4 times the total parameters, with
-almost the same number of active parameters.
+6 capas, 6 cabezas, 384 dimensiones, un contexto de 256 tokens, cerca de 10
+millones de parámetros. Un entrenamiento tarda minutos en MPS. La variante MoE
+del capítulo 12 usa 8 expertos con top-2. Eso da unas 4 veces los parámetros
+totales, con casi la misma cantidad de parámetros activos.
 
-## Acceptance criteria
+## Criterios de aceptación
 
-| Chapter | Condition |
+| Capítulo | Condición |
 |---|---|
-| ch05 | The vectorized attention agrees with the loop version, `allclose` |
-| ch07 | The model with the real `gpt2` weights gives the reference logits, atol 1e-4 |
-| ch08 | The dense model goes under the validation loss target |
-| ch11 | The vectorized MoE agrees with the naive MoE, `allclose` |
-| ch12 | The MoE model gets a lower validation loss than the dense model, at equal active parameters |
+| ch05 | El attention vectorizado coincide con la versión con loop, `allclose` |
+| ch07 | El modelo con los pesos reales de `gpt2` da los logits de referencia, atol 1e-4 |
+| ch08 | El modelo denso baja del loss de validación objetivo |
+| ch11 | El MoE vectorizado coincide con el MoE naive, `allclose` |
+| ch12 | El modelo MoE llega a un loss de validación más bajo que el modelo denso, con los mismos parámetros activos |
 
-The criterion of Chapter 7 is the strongest one. A model that produces the
-logits of the real GPT-2 from the real weights is GPT-2, not something similar.
+El criterio del capítulo 7 es el más fuerte. Un modelo que, a partir de los
+pesos reales, produce los logits del GPT-2 real es GPT-2, no algo parecido.
 
-## State
+## Estado
 
-Complete: the scaffolding, ch00, ch01, ch02. 39 tests.
-Next: ch03 to ch08, then the MoE part.
+Listo: el andamiaje, ch00, ch01, ch02. 39 tests.
+Sigue: de ch03 a ch08, y después la parte de MoE.

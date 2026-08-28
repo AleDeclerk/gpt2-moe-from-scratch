@@ -1,4 +1,4 @@
-"""Chapter 1 — reference code."""
+"""Capítulo 1: código de referencia."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import torch
 
 
 class CharTokenizer:
-    """A tokenizer with one integer for each different character."""
+    """Un tokenizador que le da un entero a cada carácter distinto."""
 
     def __init__(self, chars: list[str]) -> None:
         self.chars = list(chars)
@@ -15,8 +15,8 @@ class CharTokenizer:
 
     @classmethod
     def from_text(cls, text: str) -> "CharTokenizer":
-        # sorted() gives the same order on every run. A plain set() does not,
-        # and a saved model holds identifiers, not characters.
+        # sorted() da el mismo orden en todas las corridas. Un set() pelado no,
+        # y un modelo guardado tiene adentro identificadores, no caracteres.
         return cls(sorted(set(text)))
 
     @property
@@ -34,7 +34,7 @@ def train_val_split(
     data: torch.Tensor,
     val_fraction: float = 0.1,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Cut the sequence into a training part and a validation part."""
+    """Cortá la secuencia en una parte de entrenamiento y una de validación."""
     cut = int(len(data) * (1.0 - val_fraction))
     return data[:cut], data[cut:]
 
@@ -45,10 +45,10 @@ def get_batch(
     block_size: int,
     generator: torch.Generator | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Take a batch of random blocks, and the same blocks moved one position."""
-    # y reads position i + block_size, so the largest valid offset is
-    # len(data) - block_size - 1. randint excludes the high value, so the
-    # argument is len(data) - block_size.
+    """Tomá un batch de bloques al azar, y los mismos corridos una posición."""
+    # y lee hasta la posición i + block_size, así que el offset válido más
+    # grande es len(data) - block_size - 1. randint no incluye el valor high,
+    # así que el argumento que le pasás es len(data) - block_size.
     high = len(data) - block_size
     offsets = torch.randint(high, (batch_size,), generator=generator)
     x = torch.stack([data[i : i + block_size] for i in offsets])

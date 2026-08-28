@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-// The website lives in web/, and the course lives one level up. Every number
-// on this site comes from those files, so the site has no state of its own.
+// El sitio vive en web/, y el curso vive un nivel más arriba. Todos los
+// números del sitio salen de esos archivos, así que el sitio no tiene estado propio.
 const REPO_ROOT = path.join(process.cwd(), "..");
 
 export type TestResult = { name: string; passed: boolean };
@@ -68,7 +68,7 @@ export function getChapterReadme(dir: string): string | null {
   return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : null;
 }
 
-/** The number of a chapter, taken from its directory name: ch04_x gives "04". */
+/** El número de un capítulo, sacado del nombre del directorio: ch04_x da "04". */
 export function chapterNumber(dir: string): string {
   return dir.slice(2, 4);
 }

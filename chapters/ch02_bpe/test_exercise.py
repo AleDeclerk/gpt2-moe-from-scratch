@@ -1,4 +1,4 @@
-"""Tests for Chapter 2.
+"""Tests del capítulo 2.
 
     uv run pytest chapters/ch02_bpe
 """
@@ -40,7 +40,7 @@ def test_merge_replaces_every_occurrence(target):
 
 
 def test_merge_handles_the_overlap(target):
-    """[1, 1, 1] has the pair two times, but only one merge is possible."""
+    """[1, 1, 1] tiene el par dos veces, pero solo entra un merge."""
     assert target.merge([1, 1, 1], (1, 1), 9) == [9, 1]
     assert target.merge([1, 1, 1, 1], (1, 1), 9) == [9, 9]
 
@@ -54,7 +54,7 @@ def test_merge_keeps_the_end_of_the_list(target):
 def test_merge_does_not_change_the_input(target):
     ids = [1, 2, 3]
     target.merge(ids, (1, 2), 9)
-    assert ids == [1, 2, 3], "return a new list"
+    assert ids == [1, 2, 3], "devolvé una lista nueva"
 
 
 def test_merge_of_the_readme_example(target):
@@ -85,7 +85,7 @@ def test_train_rejects_a_vocabulary_under_256(target):
 
 
 def test_train_stops_early_when_no_pair_is_left(target):
-    """A one-character text has no pair, so the loop must stop, not crash."""
+    """Un texto de un carácter no tiene pares: el loop corta, no rompe."""
     tokenizer = target.BPETokenizer()
     tokenizer.train("a", vocab_size=300)
     assert len(tokenizer.merges) == 0
@@ -99,7 +99,7 @@ def test_vocabulary_holds_the_bytes_of_each_token(target):
         assert tokenizer.vocab[new_id] == expected
 
 
-# --- encode and decode -----------------------------------------------------
+# --- encode y decode -------------------------------------------------------
 
 
 def test_encode_and_decode_are_inverse(target):
@@ -110,7 +110,7 @@ def test_encode_and_decode_are_inverse(target):
 
 
 def test_roundtrip_of_text_that_is_not_in_the_corpus(target):
-    """A byte vocabulary has no unknown token, so any text must survive."""
+    """Un vocabulario de bytes no tiene token desconocido: todo texto sobrevive."""
     tokenizer = target.BPETokenizer()
     tokenizer.train(CORPUS, vocab_size=300)
     for text in ["señor", "日本語", "emoji: 🤖", "", "\t\n\x00"]:
@@ -118,7 +118,7 @@ def test_roundtrip_of_text_that_is_not_in_the_corpus(target):
 
 
 def test_encode_applies_the_merges_in_order(target):
-    """A later merge is built from an earlier one, so the order is the result."""
+    """Un merge se construye sobre otro anterior: el orden define el resultado."""
     tokenizer = target.BPETokenizer()
     tokenizer.train("aaabdaaabac", vocab_size=259)
     a, b, c, d = ord("a"), ord("b"), ord("c"), ord("d")
@@ -131,29 +131,29 @@ def test_encode_compresses_the_text(target):
     tokenizer.train(CORPUS, vocab_size=400)
     raw = len(CORPUS.encode("utf-8"))
     tokens = len(tokenizer.encode(CORPUS))
-    assert tokens < raw, "more tokens than bytes means that the merges do not apply"
+    assert tokens < raw, "más tokens que bytes significa que los merges no se aplican"
 
 
 def test_decode_survives_an_invalid_byte_sequence(target):
-    """Generation can cut a multi-byte character, so decode must not raise."""
+    """La generación puede cortar un carácter multibyte: decode no puede romper."""
     tokenizer = target.BPETokenizer()
     tokenizer.train(CORPUS, vocab_size=300)
     assert tokenizer.decode([195]) == "�"
 
 
-# --- the real corpus -------------------------------------------------------
+# --- el corpus real --------------------------------------------------------
 
 
 @pytest.mark.slow
-@pytest.mark.skipif(not DATA.exists(), reason="run scripts/get_data.py first")
+@pytest.mark.skipif(not DATA.exists(), reason="corré scripts/get_data.py primero")
 def test_compression_ratio(target, capsys):
-    """Measure the trade of chapter 1 against chapter 2. This test prints."""
+    """Compara el trade-off del capítulo 1 con el capítulo 2. Este test imprime."""
     text = DATA.read_text(encoding="utf-8")[:200_000]
     tokenizer = target.BPETokenizer()
     tokenizer.train(text, vocab_size=512)
     tokens = len(tokenizer.encode(text))
     with capsys.disabled():
-        print(f"\n  characters: {len(text)}")
-        print(f"  BPE tokens: {tokens}")
-        print(f"  ratio:      {len(text) / tokens:.2f} characters for each token")
+        print(f"\n  caracteres: {len(text)}")
+        print(f"  tokens BPE: {tokens}")
+        print(f"  ratio:      {len(text) / tokens:.2f} caracteres por token")
     assert len(text) / tokens > 1.5

@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const found = getChapter(dir);
   if (!found) return {};
   return {
-    title: `${chapterNumber(dir)} — ${found.chapter.title}`,
+    title: `${chapterNumber(dir)} · ${found.chapter.title}`,
     description: found.chapter.writes,
   };
 }
@@ -59,7 +59,7 @@ export default async function ChapterPage({ params }: Props) {
           <StatusChip status={chapter.status} />
         </div>
         <p className="mt-4 max-w-[60ch] font-prose text-[16px] text-faint">
-          You write: {chapter.writes.toLowerCase()}.
+          Vos escribís: {chapter.writes.toLowerCase()}.
         </p>
       </header>
 
@@ -82,8 +82,8 @@ export default async function ChapterPage({ params }: Props) {
                     {test.passed ? "✓" : "·"}
                   </span>
                   <span className={`[overflow-wrap:anywhere] ${test.passed ? "text-dim" : "text-faint"}`}>
-                    {/* Every name starts with test_, so the prefix carries no
-                        information. The title attribute keeps the exact name. */}
+                    {/* Todos los nombres empiezan con test_, así que el prefijo no
+                        aporta nada. El atributo title guarda el nombre exacto. */}
                     {test.name.replace(/^test_/, "")}
                   </span>
                 </li>
@@ -92,25 +92,25 @@ export default async function ChapterPage({ params }: Props) {
           </section>
 
           <section className="mt-5 border border-rule p-5">
-            <p className="text-[10px] tracking-[0.18em] text-faint uppercase">Run it</p>
+            <p className="text-[10px] tracking-[0.18em] text-faint uppercase">Correlo</p>
             <pre className="mt-3 overflow-x-auto text-[11px] leading-relaxed text-dim">
               <code>{`uv run pytest \\\n  chapters/${dir}`}</code>
             </pre>
             <p className="mt-4 text-[10px] tracking-[0.18em] text-faint uppercase">
-              Then promote
+              Después promové
             </p>
             <pre className="mt-3 overflow-x-auto text-[11px] leading-relaxed text-dim">
               <code>{`uv run python \\\n  scripts/promote.py ch${chapterNumber(dir)}`}</code>
             </pre>
             <p className="mt-3 text-[11px] text-faint">
               {chapter.promoted
-                ? `Promoted. gpt2moe/${chapter.module}.py exists.`
-                : `Not promoted yet.`}
+                ? `Promovido. Existe gpt2moe/${chapter.module}.py.`
+                : `Todavía sin promover.`}
             </p>
           </section>
 
           <section className="mt-5 border border-rule p-5">
-            <p className="text-[10px] tracking-[0.18em] text-faint uppercase">Files</p>
+            <p className="text-[10px] tracking-[0.18em] text-faint uppercase">Archivos</p>
             <ul className="mt-3 space-y-2 text-[12px]">
               {["exercise.py", "test_exercise.py", "solution.py"].map((name) => (
                 <li key={name}>
@@ -148,7 +148,7 @@ export default async function ChapterPage({ params }: Props) {
         ) : (
           next && (
             <span className="text-rule">
-              {chapterNumber(next.dir)} &#183; {next.title} &#183; not written yet
+              {chapterNumber(next.dir)} &#183; {next.title} &#183; todavía sin escribir
             </span>
           )
         )}
