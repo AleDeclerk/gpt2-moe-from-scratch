@@ -73,12 +73,18 @@ export default async function ChapterPage({ params }: Props) {
             </p>
             <ul className="mt-4 space-y-[7px]">
               {chapter.tests.map((test) => (
-                <li key={test.name} className="flex gap-2.5 text-[11.5px] leading-snug">
+                <li
+                  key={test.name}
+                  title={test.name}
+                  className="flex gap-2.5 text-[11.5px] leading-snug"
+                >
                   <span className={test.passed ? "text-done" : "text-rule"}>
                     {test.passed ? "✓" : "·"}
                   </span>
-                  <span className={`break-all ${test.passed ? "text-dim" : "text-faint"}`}>
-                    {test.name}
+                  <span className={`[overflow-wrap:anywhere] ${test.passed ? "text-dim" : "text-faint"}`}>
+                    {/* Every name starts with test_, so the prefix carries no
+                        information. The title attribute keeps the exact name. */}
+                    {test.name.replace(/^test_/, "")}
                   </span>
                 </li>
               ))}
