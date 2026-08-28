@@ -7,3 +7,5 @@ data/*
 out/*
 !out/.gitkeep
 .DS_Store
+.vercel
+.env*
