@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@theme {
+@theme static {
   --color-paper: #100f0d;
   --color-raised: #171512;
   --color-ink: #ede7da;

@@ -52,13 +52,13 @@ export default async function ChapterPage({ params }: Props) {
           </Link>
         </p>
         <div className="mt-5 flex flex-wrap items-end justify-between gap-6">
-          <h1 className="flex items-baseline gap-5 font-[family-name:var(--font-display)] text-[clamp(2.1rem,5vw,3.4rem)] leading-none">
+          <h1 className="flex items-baseline gap-5 font-display text-[clamp(2.1rem,5vw,3.4rem)] leading-none">
             <span className="text-rule tabular-nums">{chapterNumber(dir)}</span>
             <span>{chapter.title}</span>
           </h1>
           <StatusChip status={chapter.status} />
         </div>
-        <p className="mt-4 max-w-[60ch] font-[family-name:var(--font-prose)] text-[16px] text-faint">
+        <p className="mt-4 max-w-[60ch] font-prose text-[16px] text-faint">
           You write: {chapter.writes.toLowerCase()}.
         </p>
       </header>

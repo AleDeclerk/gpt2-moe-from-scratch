@@ -19,7 +19,7 @@ export default function Home() {
             A course you run, not a course you watch
           </p>
           <h1
-            className="rise font-[family-name:var(--font-display)] text-[clamp(2.7rem,7vw,4.6rem)] leading-[0.95] tracking-[-0.01em]"
+            className="rise font-display text-[clamp(2.7rem,7vw,4.6rem)] leading-[0.95] tracking-[-0.01em]"
             style={{ "--i": 1 } as React.CSSProperties}
           >
             GPT&#8209;2 with a<br />
@@ -28,7 +28,7 @@ export default function Home() {
             <span className="text-faint italic">from scratch.</span>
           </h1>
           <p
-            className="rise mt-8 max-w-[52ch] font-[family-name:var(--font-prose)] text-[17px] leading-[1.7] text-dim"
+            className="rise mt-8 max-w-[52ch] font-prose text-[17px] leading-[1.7] text-dim"
             style={{ "--i": 2 } as React.CSSProperties}
           >
             Fourteen chapters that build a language model twice. First the dense
@@ -46,7 +46,7 @@ export default function Home() {
           <p className="text-[10px] tracking-[0.18em] text-faint uppercase">
             Progress, measured
           </p>
-          <p className="mt-5 font-[family-name:var(--font-display)] text-6xl leading-none tabular-nums">
+          <p className="mt-5 font-display text-6xl leading-none tabular-nums">
             {totals.tests_passed}
             <span className="text-2xl text-faint">/{totals.tests_total}</span>
           </p>
@@ -103,8 +103,8 @@ export default function Home() {
         ].map((step, i) => (
           <div key={step.n} className="rise" style={{ "--i": i } as React.CSSProperties}>
             <p className="text-[11px] tracking-[0.18em] text-accent">{step.n}</p>
-            <h2 className="mt-3 font-[family-name:var(--font-display)] text-xl">{step.head}</h2>
-            <p className="mt-2 max-w-[38ch] font-[family-name:var(--font-prose)] text-[15px] leading-relaxed text-faint">
+            <h2 className="mt-3 font-display text-xl">{step.head}</h2>
+            <p className="mt-2 max-w-[38ch] font-prose text-[15px] leading-relaxed text-faint">
               {step.body}
             </p>
           </div>
@@ -115,12 +115,12 @@ export default function Home() {
       {parts.map((part, partIndex) => (
         <section key={part.title} className="border-b border-rule py-14">
           <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:gap-6">
-            <span className="font-[family-name:var(--font-display)] text-4xl text-rule tabular-nums">
+            <span className="font-display text-4xl text-rule tabular-nums">
               {String(partIndex + 1).padStart(2, "0")}
             </span>
             <div>
-              <h2 className="font-[family-name:var(--font-display)] text-2xl">{part.title}</h2>
-              <p className="mt-1 max-w-[62ch] font-[family-name:var(--font-prose)] text-[15px] text-faint">
+              <h2 className="font-display text-2xl">{part.title}</h2>
+              <p className="mt-1 max-w-[62ch] font-prose text-[15px] text-faint">
                 {part.blurb}
               </p>
             </div>
@@ -130,12 +130,12 @@ export default function Home() {
             {part.chapters.map((chapter) => {
               const inner = (
                 <div className="grid grid-cols-[2.6rem_1fr] items-baseline gap-x-4 gap-y-3 py-4 md:grid-cols-[2.6rem_minmax(0,1fr)_auto_7.5rem] md:items-center">
-                  <span className="font-[family-name:var(--font-display)] text-2xl text-faint tabular-nums transition-colors group-hover:text-accent">
+                  <span className="font-display text-2xl text-faint tabular-nums transition-colors group-hover:text-accent">
                     {chapterNumber(chapter.dir)}
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-[15px] text-ink">{chapter.title}</p>
-                    <p className="mt-1 truncate font-[family-name:var(--font-prose)] text-[14px] text-faint">
+                    <p className="mt-1 truncate font-prose text-[14px] text-faint">
                       {chapter.writes}
                     </p>
                   </div>
