@@ -31,8 +31,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const { totals, repo } = getProgress();
 
   return (
-    <html lang="en">
-      <body className={`${plexMono.variable} ${instrument.variable} ${sourceSerif.variable}`}>
+    // The font variables must sit on <html>. The theme in globals.css defines
+    // --font-display in :root, and it reads these. A definition on <body>
+    // would be invisible from :root, and every font would fall back.
+    <html lang="en" className={`${plexMono.variable} ${instrument.variable} ${sourceSerif.variable}`}>
+      <body>
         <header className="sticky top-0 z-50 border-b border-rule bg-paper/85 backdrop-blur-sm">
           <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-4 px-6 py-3 text-[11px] tracking-[0.14em] uppercase">
             <Link href="/" className="text-ink transition-colors hover:text-accent">
