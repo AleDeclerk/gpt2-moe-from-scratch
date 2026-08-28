@@ -35,6 +35,28 @@ pass. The next chapter imports from the package, so it imports your own code.
 By Chapter 8 you train a model that is your work from the tokenizer to the
 optimizer.
 
+## The website
+
+<https://gpt2-moe-from-scratch.vercel.app>
+
+The site shows the theory of each chapter and the state of the course. It
+reads the README of each chapter, so the text has one home only.
+
+The progress is a measurement, not a declaration:
+
+1. You make the tests of a chapter pass.
+2. You push.
+3. A GitHub Action runs pytest for every chapter, and writes the result of
+   each test to `progress.json`.
+4. Vercel builds the site again from that file.
+
+The site holds no state of its own, so it cannot show a green chapter while
+the tests fail. To see the numbers before a push, run the measurement:
+
+```bash
+uv run python scripts/sync_progress.py
+```
+
 ## Install
 
 1. Install `uv`, if the computer does not have it.
